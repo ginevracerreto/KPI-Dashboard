@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plant KPI Dashboard</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --siemens-teal:   #00D7A0;
+      --siemens-dark:   #009999;
+      --bg-dark:        #0D1B2A;
+      --bg-card:        #132337;
+      --bg-card-hover:  #1A2F47;
+      --text-primary:   #E8F4FD;
+      --text-secondary: #8BAFC7;
+      --border:         #1E3A52;
+      --green:          #00C48C;
+      --yellow:         #FFB800;
+      --red:            #FF4757;
+      --gray:           #5A7A8A;
+      --badge-ehs:      #FF6B6B;
+      --badge-quality:  #4ECDC4;
+      --badge-delivery: #45B7D1;
+      --badge-cost:     #96CEB4;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0A1628 0%, #132337 50%, #0D1B2A 100%);
+      border-bottom: 2px solid var(--siemens-teal);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 24px rgba(0,215,160,0.1);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .siemens-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: var(--siemens-teal);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: #0D1B2A;
+      letter-spacing: -1px;
+    }
+
+    .logo-text {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 32px;
+      background: var(--border);
+    }
+
+    .header-title {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0,196,140,0.1);
+      border: 1px solid rgba(0,196,140,0.3);
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.75rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ── Hero Section ── */
+    .hero {
+      padding: 3rem 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--siemens-teal);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, #E8F4FD 0%, var(--siemens-teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 560px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+    }
+
+    /* ── Summary Bar ── */
+    .summary-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 0 2rem 2.5rem;
+    }
+
+    .summary-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+    }
+
+    .summary-chip .chip-num {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--siemens-teal);
+    }
+
+    .summary-chip .chip-label {
+      color: var(--text-secondary);
+    }
+
+    /* ── Section Label ── */
+    .section-label {
+      padding: 0 2rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+      margin: 0 2rem 1.5rem;
+    }
+
+    /* ── Department Grid ── */
+    .dept-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+      padding: 0 2rem 3rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── Department Card ── */
+    .dept-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dept-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--card-accent, var(--siemens-teal));
+      border-radius: 16px 16px 0 0;
+    }
+
+    .dept-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(0,215,160,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .dept-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--siemens-teal);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0,215,160,0.12);
+    }
+
+    .dept-card:hover .card-arrow {
+      transform: translateX(4px);
+      color: var(--siemens-teal);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--icon-bg, rgba(0,215,160,0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+
+    .card-arrow {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+      margin-top: 4px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    /* ── KPI Type Badges ── */
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+
+    .badge-S { background: rgba(255,107,107,0.15); color: #FF6B6B; border: 1px solid rgba(255,107,107,0.3); }
+    .badge-Q { background: rgba(78,205,196,0.15);  color: #4ECDC4; border: 1px solid rgba(78,205,196,0.3); }
+    .badge-D { background: rgba(69,183,209,0.15);  color: #45B7D1; border: 1px solid rgba(69,183,209,0.3); }
+    .badge-C { background: rgba(150,206,180,0.15); color: #96CEB4; border: 1px solid rgba(150,206,180,0.3); }
+
+    /* ── KPI Count Row ── */
+    .kpi-counts {
+      display: flex;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .kpi-count-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .kpi-count-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .kpi-count-num.primary   { color: var(--siemens-teal); }
+    .kpi-count-num.secondary { color: var(--yellow); }
+
+    .kpi-count-label {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 0.2rem;
+    }
+
+    /* ── Status Mini Bar ── */
+    .status-mini {
+      display: flex;
+      gap: 3px;
+      margin-top: 0.8rem;
+    }
+
+    .status-mini-seg {
+      height: 4px;
+      border-radius: 2px;
+      flex: 1;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .dept-grid { grid-template-columns: 1fr; padding: 0 1rem 2rem; }
+      .hero { padding: 2rem 1rem 1rem; }
+      .summary-bar { padding: 0 1rem 2rem; }
+      .section-label { margin: 0 1rem 1rem; }
+      header { padding: 0 1rem; }
+      .header-title { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════ HEADER ══════════ -->
+  <header>
+    <div class="header-left">
+      <div class="siemens-logo">
+        <div class="logo-mark">SI</div>
+        <span class="logo-text">Siemens</span>
+      </div>
+      <div class="header-divider"></div>
+      <span class="header-title">Manufacturing Operations Center</span>
+    </div>
+    <div class="header-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        Live Dashboard
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section class="hero">
+    <div class="hero-eyebrow">🏭 North Star KPI Command Center</div>
+    <h1>Production Plant<br/>Performance Dashboard</h1>
+    <p>Select a department below to explore its key performance indicators, track targets, and identify areas that need attention.</p>
+  </section>
+
+  <!-- ══════════ SUMMARY BAR ══════════ -->
+  <div class="summary-bar">
+    <div class="summary-chip">
+      <span class="chip-num">11</span>
+      <span class="chip-label">Departments</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-num">40+</span>
+      <span class="chip-label">Primary KPIs</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-num">100+</span>
+      <span class="chip-label">Total KPIs</span>
+    </div>
+    <div class="summary-chip">
+      <span class="chip-num">6</span>
+      <span class="chip-label">KPI Categories</span>
+    </div>
+  </div>
+
+  <!-- ══════════ DEPARTMENT GRID ══════════ -->
+  <div class="section-label">Select a Department</div>
+
+  <div class="dept-grid">
+
+    <!-- Engineering -->
+    <a class="dept-card" href="engineering.html"
+       style="--card-accent:#45B7D1; --icon-bg:rgba(69,183,209,0.12);">
+      <div class="card-header">
+        <div class="card-icon">⚙️</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Engineering</div>
+      <div class="card-subtitle">Design, OEPR, Delivery Reliability</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">4</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">4</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">8</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+      </div>
+    </a>
+
+    <!-- Fabrication -->
+    <a class="dept-card" href="fabrication.html"
+       style="--card-accent:#FF6B6B; --icon-bg:rgba(255,107,107,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🔧</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Fabrication</div>
+      <div class="card-subtitle">OEE, Productivity, Cycle Time, Quality</div>
+      <div class="badge-row">
+        <span class="badge badge-Q">Quality</span>
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">8</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">18</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">26</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:2;"></div>
+        <div class="status-mini-seg" style="background:#FF4757; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
+      </div>
+    </a>
+
+    <!-- Logistics - Materials -->
+    <a class="dept-card" href="logistics-materials.html"
+       style="--card-accent:#96CEB4; --icon-bg:rgba(150,206,180,0.12);">
+      <div class="card-header">
+        <div class="card-icon">📦</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Logistics — Materials</div>
+      <div class="card-subtitle">Inventory Accuracy, Aging, Raw Material</div>
+      <div class="badge-row">
+        <span class="badge badge-C">Cost</span>
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-Q">Quality</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">1</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">8</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">9</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:4;"></div>
+      </div>
+    </a>
+
+    <!-- Logistics - Supermarket -->
+    <a class="dept-card" href="logistics-supermarket.html"
+       style="--card-accent:#FFEAA7; --icon-bg:rgba(255,234,167,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🛒</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Logistics — Supermarket</div>
+      <div class="card-subtitle">Kit Accuracy, Water Level, Aging</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+        <span class="badge badge-S">Safety</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">3</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">12</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">15</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
+      </div>
+    </a>
+
+    <!-- Logistics - Warehouse -->
+    <a class="dept-card" href="logistics-warehouse.html"
+       style="--card-accent:#A29BFE; --icon-bg:rgba(162,155,254,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🏗️</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Logistics — Warehouse</div>
+      <div class="card-subtitle">RTS, Kit Accuracy, Water Level, Aging</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+        <span class="badge badge-Q">Quality</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">4</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">11</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">15</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
+      </div>
+    </a>
+
+    <!-- Logistics - Shipping -->
+    <a class="dept-card" href="logistics-shipping.html"
+       style="--card-accent:#74B9FF; --icon-bg:rgba(116,185,255,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🚚</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Logistics — Shipping</div>
+      <div class="card-subtitle">Storage Aging, Shipped Quantity, SAP</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">2</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">11</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">13</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
+      </div>
+    </a>
+
+    <!-- Purchasing -->
+    <a class="dept-card" href="purchasing.html"
+       style="--card-accent:#FDCB6E; --icon-bg:rgba(253,203,110,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🛍️</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Purchasing</div>
+      <div class="card-subtitle">Aging POs, Vendor Tracking, Requisitions</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">4</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">7</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">11</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:2;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
+      </div>
+    </a>
+
+    <!-- Safety / EHS -->
+    <a class="dept-card" href="safety.html"
+       style="--card-accent:#FF7675; --icon-bg:rgba(255,118,117,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🦺</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Safety — EHS</div>
+      <div class="card-subtitle">Recordables, LTIR, 6S, Near Misses</div>
+      <div class="badge-row">
+        <span class="badge badge-S">Safety</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">7</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">5</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">12</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:3;"></div>
+        <div class="status-mini-seg" style="background:#FFB800; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+      </div>
+    </a>
+
+    <!-- SWBD -->
+    <a class="dept-card" href="swbd.html"
+       style="--card-accent:#00D7A0; --icon-bg:rgba(0,215,160,0.12);">
+      <div class="card-header">
+        <div class="card-icon">⚡</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">SWBD</div>
+      <div class="card-subtitle">Switchboard — Sequence, DR, Aging, Output</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-Q">Quality</span>
+        <span class="badge badge-C">Cost</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">10</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">22</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">32</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#FFB800; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
+      </div>
+    </a>
+
+    <!-- LVSG -->
+    <a class="dept-card" href="lvsg.html"
+       style="--card-accent:#6C5CE7; --icon-bg:rgba(108,92,231,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🔌</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">LVSG</div>
+      <div class="card-subtitle">Low Voltage — Productivity, FPY, Delivery</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-Q">Quality</span>
+        <span class="badge badge-C">Cost</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">6</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">4</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">10</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
+      </div>
+    </a>
+
+    <!-- PP -->
+    <a class="dept-card" href="pp.html"
+       style="--card-accent:#FD79A8; --icon-bg:rgba(253,121,168,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🏭</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">PP</div>
+      <div class="card-subtitle">Production Planning — Output & Throughput</div>
+      <div class="badge-row">
+        <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">2</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">2</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">4</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
+      </div>
+    </a>
+
+  </div><!-- /dept-grid -->
+
+  <!-- ══════════ FOOTER ══════════ -->
+  <footer>
+    <p>Siemens Manufacturing Operations · Plant KPI Dashboard · Data refreshes per department schedule</p>
+    <p style="margin-top:0.4rem; opacity:0.5;">S = Safety &nbsp;|&nbsp; Q = Quality &nbsp;|&nbsp; D = Delivery &nbsp;|&nbsp; C = Cost</p>
+  </footer>
+
+</body>
+</html>
