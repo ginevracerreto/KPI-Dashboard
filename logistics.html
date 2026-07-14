@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Logistics Dashboard – Siemens</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a1a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        header {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(116,185,255,0.3);
+        }
+        header h1 { font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: 1px; }
+        .back-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.82rem;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.28); }
+
+        /* ── Tabs ── */
+        .tabs-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 18px 28px 0;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 8px 26px;
+            border-radius: 24px;
+            border: 2px solid #74b9ff;
+            background: transparent;
+            color: #74b9ff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 1px;
+        }
+        .tab-btn:hover { background: rgba(116,185,255,0.12); }
+        .tab-btn.active { background: #74b9ff; color: #0a0a1a; }
+
+        /* ── Dashboard wrapper ── */
+        .dashboard { display: none; padding: 16px 24px 40px; max-width: 1400px; margin: 0 auto; }
+        .dashboard.active { display: block; }
+
+        /* ── Section Label ── */
+        .section-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #74b9ff;
+            margin: 20px 0 10px;
+            border-left: 3px solid #74b9ff;
+            padding-left: 8px;
+        }
+
+        /* ── Main Grid ── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .col-1 { grid-column: span 1; }
+        .col-2 { grid-column: span 2; }
+        .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; }
+
+        /* ── Chart Card ── */
+        .chart-card {
+            background: #12122a;
+            border: 1px solid #1e1e3a;
+            border-radius: 12px;
+            padding: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .chart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(116,185,255,0.12);
+        }
+        .chart-title {
+            font-size: 0.72rem;
+            color: #8888aa;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        /* ── Gauge Card ── */
+        .gauge-card {
+            background: #12122a;
+            border: 1px solid #1e1e3a;
+            border-radius: 12px;
+            padding: 12px 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .gauge-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(116,185,255,0.12);
+        }
+        .gauge-title { font-size: 0.68rem; color: #8888aa; text-align: center; font-weight: 600; }
+        .gauge-card canvas { max-width: 110px; }
+        .gauge-value { font-size: 1.2rem; font-weight: 700; color: #fff; margin-top: -10px; }
+        .gauge-target { font-size: 0.62rem; color: #555577; }
+
+        /* ── KPI Stat Card ── */
+        .kpi-card {
+            background: #12122a;
+            border: 1px solid #1e1e3a;
+            border-radius: 12px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(116,185,255,0.12);
+        }
+        .kpi-title  { font-size: 0.68rem; color: #8888aa; text-align: center; font-weight: 600; }
+        .kpi-value  { font-size: 1.7rem; font-weight: 700; color: #fff; }
+        .kpi-target { font-size: 0.62rem; color: #555577; }
+        .kpi-badge  { font-size: 0.62rem; padding: 2px 8px; border-radius: 8px; font-weight: 700; }
+        .badge-green  { background: rgba(0,212,100,0.15);  color: #00d464; }
+        .badge-red    { background: rgba(255,60,60,0.15);   color: #ff4444; }
+        .badge-yellow { background: rgba(255,200,0,0.15);   color: #ffc800; }
+
+        /* ── Progress Bars ── */
+        .progress-list { display: flex; flex-direction: column; gap: 8px; }
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.68rem;
+            color: #aaaacc;
+            margin-bottom: 3px;
+        }
+        .progress-bar-bg { background: #1e1e3a; border-radius: 4px; height: 8px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+        .fill-green  { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+        .fill-yellow { background: linear-gradient(90deg, #ffc800, #ff9900); }
+        .fill-red    { background: linear-gradient(90deg, #ff4444, #ff0000); }
+
+        /* ── Secondary Table ── */
+        .secondary-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        .secondary-table th {
+            background: #1a1a35;
+            color: #74b9ff;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .secondary-table td { padding: 7px 12px; border-bottom: 1px solid #1e1e3a; color: #cccce0; }
+        .secondary-table tr:hover td { background: #16163a; }
+
+        /* ── Footer ── */
+        .dash-footer {
+            text-align: center;
+            color: #333355;
+            font-size: 0.68rem;
+            padding: 14px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+    <h1>📦 Logistics Dashboard</h1>
+    <a href="index.html" class="back-btn">← Back to Home</a>
+</header>
+
+<!-- ══ TABS ══ -->
+<div class="tabs-wrapper">
+    <button class="tab-btn active" onclick="switchTab('Materials',   this)">Materials</button>
+    <button class="tab-btn"        onclick="switchTab('Supermarket', this)">Supermarket</button>
+    <button class="tab-btn"        onclick="switchTab('Warehouse',   this)">Warehouse</button>
+    <button class="tab-btn"        onclick="switchTab('Shipping',    this)">Shipping</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     MATERIALS
+════════════════════════════════════════ -->
+<div id="tab-Materials" class="dashboard active">
+
+    <div class="section-label">Inventory Accuracy</div>
+    <div class="main-grid">
+
+        <!-- Inventory Count Accuracy — gauge -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">QTR Count Accuracy</div>
+            <canvas id="mat-countGauge"></canvas>
+            <div class="gauge-value" id="mat-countVal">96.2%</div>
+            <div class="gauge-target">Target ≥ 95%</div>
+        </div>
+
+        <!-- Dollar Value Accuracy — gauge -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">Dollar Value Accuracy</div>
+            <canvas id="mat-dollarGauge"></canvas>
+            <div class="gauge-value" id="mat-dollarVal">98.5%</div>
+            <div class="gauge-target">Target ≥ 98%</div>
+        </div>
+
+        <!-- Inventory Adjustments — monthly bar -->
+        <div class="chart-card col-2">
+            <div class="chart-title">💲 Inventory Adjustments — Monthly % of Inventory Value (Target &lt; 2%)</div>
+            <canvas id="mat-adjChart" height="120"></canvas>
+        </div>
+
+    </div>
+
+    <div class="section-label">Raw Material</div>
+    <div class="main-grid">
+
+        <!-- Raw Material Inspection -->
+        <div class="chart-card col-2">
+            <div class="chart-title">🔍 Raw Material Inspection — Supplier Incident Rate (Monthly)</div>
+            <canvas id="mat-inspChart" height="120"></canvas>
+        </div>
+
+        <!-- Open Bundles -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Open Bundles Count</div>
+            <div class="kpi-value">14</div>
+            <div class="kpi-target">Target: 0</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+        <!-- COGI -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">COGI Count</div>
+            <div class="kpi-value">3</div>
+            <div class="kpi-target">Target: 0</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+    </div>
+
+    <div class="section-label">Secondary KPIs — Status Overview</div>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th style="text-align:center;">Value</th>
+                        <th style="text-align:center;">Target</th>
+                        <th style="text-align:center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="mat-secondary"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /Materials -->
+
+<!-- ════════════════════════════════════════
+     SUPERMARKET
+════════════════════════════════════════ -->
+<div id="tab-Supermarket" class="dashboard">
+
+    <div class="section-label">Flow & Delivery</div>
+    <div class="main-grid">
+
+        <!-- Water Level Adherence — gauge -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">Water Level Adherence</div>
+            <canvas id="sm-waterGauge"></canvas>
+            <div class="gauge-value" id="sm-waterVal">91.4%</div>
+            <div class="gauge-target">Target ≥ 95%</div>
+        </div>
+
+        <!-- Kit Accuracy — gauge -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">Kit Accuracy</div>
+            <canvas id="sm-kitAccGauge"></canvas>
+            <div class="gauge-value" id="sm-kitAccVal">98.7%</div>
+            <div class="gauge-target">Target 100%</div>
+        </div>
+
+        <!-- Kit Aging Time — monthly bar -->
+        <div class="chart-card col-2">
+            <div class="chart-title">⏱ Kit Aging Time — Daily Avg Days (Target &lt; 2 days)</div>
+            <canvas id="sm-kitAgingChart" height="120"></canvas>
+        </div>
+
+    </div>
+
+    <div class="section-label">Throughput & Quality</div>
+    <div class="main-grid">
+
+        <!-- Sequence Adherence -->
+        <div class="chart-card col-2">
+            <div class="chart-title">📋 Sequence Adherence — Monthly % (Target ≥ 95%)</div>
+            <canvas id="sm-seqChart" height="120"></canvas>
+        </div>
+
+        <!-- Requests TAT -->
+        <div class="chart-card col-2">
+            <div class="chart-title">🔄 Requests Turn Around Time — Avg Hours (Monthly)</div>
+            <canvas id="sm-tatChart" height="120"></canvas>
+        </div>
+
+        <!-- 6S Score -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">6S Score</div>
+            <div class="kpi-value">87%</div>
+            <div class="kpi-target">Target ≥ 90%</div>
+            <span class="kpi-badge badge-yellow">⚡ Monitor</span>
+        </div>
+
+        <!-- Inbound Audit Defect Rate -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Inbound Audit Defect Rate</div>
+            <div class="kpi-value">1.8%</div>
+            <div class="kpi-target">Target &lt; 2%</div>
+            <span class="kpi-badge badge-green">✓ On Target</span>
+        </div>
+
+        <!-- Put Away Time -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Put Away Time (Avg hrs)</div>
+            <div class="kpi-value">1.4h</div>
+            <div class="kpi-target">Target &lt; 2 hrs</div>
+            <span class="kpi-badge badge-green">✓ On Target</span>
+        </div>
+
+        <!-- Kit Pick Time -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Kit Pick Time (Avg hrs)</div>
+            <div class="kpi-value">2.3h</div>
+            <div class="kpi-target">Target &lt; 2 hrs</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+    </div>
+
+    <div class="section-label">Secondary KPIs — Status Overview</div>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th style="text-align:center;">Value</th>
+                        <th style="text-align:center;">Target</th>
+                        <th style="text-align:center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="sm-secondary"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /Supermarket -->
+
+<!-- ════════════════════════════════════════
+     WAREHOUSE
+════════════════════════════════════════ -->
+<div id="tab-Warehouse" class="dashboard">
+
+    <div class="section-label">Flow & Delivery</div>
+    <div class="main-grid">
+
+        <!-- Water Level Adherence -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">Water Level Adherence</div>
+            <canvas id="wh-waterGauge"></canvas>
+            <div class="gauge-value" id="wh-waterVal">96.1%</div>
+            <div class="gauge-target">Target ≥ 95%</div>
+        </div>
+
+        <!-- Kit Accuracy -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">Kit Accuracy</div>
+            <canvas id="wh-kitAccGauge"></canvas>
+            <div class="gauge-value" id="wh-kitAccVal">99.1%</div>
+            <div class="gauge-target">Target 100%</div>
+        </div>
+
+        <!-- Kit Aging Time -->
+        <div class="chart-card col-2">
+            <div class="chart-title">⏱ Kit Aging Time — Daily Avg Days (Target &lt; 2 days)</div>
+            <canvas id="wh-kitAgingChart" height="120"></canvas>
+        </div>
+
+        <!-- RTS Quantity -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">RTS Quantity (Overissue)</div>
+            <div class="kpi-value">7</div>
+            <div class="kpi-target">Target: 0</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+        <!-- Aging Breaker/Cradle Requests bar -->
+        <div class="chart-card col-3">
+            <div class="chart-title">📅 Aging Breaker/Cradle Requests — Days Outstanding (Last 7 Days)</div>
+            <canvas id="wh-agingReqChart" height="110"></canvas>
+        </div>
+
+    </div>
+
+    <div class="section-label">Throughput & Quality</div>
+    <div class="main-grid">
+
+        <!-- VLM Fill -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">VLM Fill Percentage</div>
+            <canvas id="wh-vlmGauge"></canvas>
+            <div class="gauge-value" id="wh-vlmVal">78.4%</div>
+            <div class="gauge-target">Target ≥ 80%</div>
+        </div>
+
+        <!-- VLM Part Turns -->
+        <div class="chart-card col-2">
+            <div class="chart-title">🔄 VLM Part Turns — Monthly</div>
+            <canvas id="wh-vlmTurnsChart" height="120"></canvas>
+        </div>
+
+        <!-- Customer Supplied Parts -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Customer Parts Received</div>
+            <div class="kpi-value">142</div>
+            <div class="kpi-target">This Month</div>
+            <span class="kpi-badge badge-green">✓ Tracked</span>
+        </div>
+
+        <!-- Deliveries Unload Time -->
+        <div class="chart-card col-2">
+            <div class="chart-title">🚛 Deliveries Unload Time — Avg Hours (Monthly)</div>
+            <canvas id="wh-unloadChart" height="120"></canvas>
+        </div>
+
+        <!-- Cycle Count Accuracy -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">Cycle Count Accuracy</div>
+            <canvas id="wh-cycleGauge"></canvas>
+            <div class="gauge-value" id="wh-cycleVal">94.3%</div>
+            <div class="gauge-target">Target ≥ 95%</div>
+        </div>
+
+        <!-- CPI Labor Efficiency -->
+        <div class="gauge-card col-1">
+            <div class="gauge-title">CPI Labor Efficiency</div>
+            <canvas id="wh-cpiGauge"></canvas>
+            <div class="gauge-value" id="wh-cpiVal">88.1%</div>
+            <div class="gauge-target">Target ≥ 85%</div>
+        </div>
+
+    </div>
+
+    <div class="section-label">Secondary KPIs — Status Overview</div>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th style="text-align:center;">Value</th>
+                        <th style="text-align:center;">Target</th>
+                        <th style="text-align:center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="wh-secondary"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /Warehouse -->
+
+<!-- ════════════════════════════════════════
+     SHIPPING
+════════════════════════════════════════ -->
+<div id="tab-Shipping" class="dashboard">
+
+    <div class="section-label">Throughput & Flow</div>
+    <div class="main-grid">
+
+        <!-- Shipped Quantity — monthly bar -->
+        <div class="chart-card col-4">
+            <div class="chart-title">📤 Shipped Quantity — Units by Production Line (Monthly)</div>
+            <canvas id="sh-shippedChart" height="100"></canvas>
+        </div>
+
+        <!-- Storage Locations 1000 Aging -->
+        <div class="chart-card col-2">
+            <div class="chart-title">📅 Storage Locations 1000 — Aging Days (Target &lt; 2 days)</div>
+            <canvas id="sh-storageAgingChart" height="120"></canvas>
+        </div>
+
+        <!-- Ship Requests Aging -->
+        <div class="chart-card col-2">
+            <div class="chart-title">⏱ Ship Requests Aging — Elapsed Days from Request</div>
+            <canvas id="sh-reqAgingChart" height="120"></canvas>
+        </div>
+
+    </div>
+
+    <div class="section-label">SAP Processing</div>
+    <div class="main-grid">
+
+        <!-- SAP 602 Unconfirmed -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">SAP 602's % Unconfirmed</div>
+            <div class="kpi-value">4.2%</div>
+            <div class="kpi-target">Target: 0%</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+        <!-- SAP 101 Unconfirmed -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">SAP 101's % Unconfirmed</div>
+            <div class="kpi-value">2.8%</div>
+            <div class="kpi-target">Target: 0%</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+        <!-- SAP 101 Incomplete Line Ups -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">SAP 101's % Incomplete Line Ups</div>
+            <div class="kpi-value">3.1%</div>
+            <div class="kpi-target">Target: 0%</div>
+            <span class="kpi-badge badge-red">⚠ Above Target</span>
+        </div>
+
+        <!-- SAP 602 Time to Process -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">SAP 602's Time to Process</div>
+            <div class="kpi-value">1.8h</div>
+            <div class="kpi-target">Target &lt; 2 hrs</div>
+            <span class="kpi-badge badge-green">✓ On Target</span>
+        </div>
+
+        <!-- Ship Requests Execution -->
+        <div class="chart-card col-2">
+            <div class="chart-title">📋 Ship Requests Execution — Request to Load Days (Monthly)</div>
+            <canvas id="sh-execChart" height="120"></canvas>
+        </div>
+
+        <!-- Ship Loose Quantity -->
+        <div class="chart-card col-2">
+            <div class="chart-title">📦 Ship Loose Quantity — Count (Monthly)</div>
+            <canvas id="sh-looseChart" height="120"></canvas>
+        </div>
+
+    </div>
+
+    <div class="section-label">Secondary KPIs — Status Overview</div>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th style="text-align:center;">Value</th>
+                        <th style="text-align:center;">Target</th>
+                        <th style="text-align:center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="sh-secondary"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div><!-- /Shipping -->
+
+<div class="dash-footer">Siemens Internal Dashboard · Mock Data · Refresh: Daily</div>
+
+<script>
+// ══════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════
+
+function switchTab(name, btn) {
+    document.querySelectorAll('.dashboard').forEach(d => d.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+}
+
+const ACCENT = '#74b9ff';
+
+function makeGauge(canvasId, value, target, isLowerBetter = false) {
+    const pct  = Math.min(value, 100);
+    const good = isLowerBetter ? value <= target : value >= target;
+    const color = good
+        ? ACCENT
+        : (Math.abs(value - target) < 3 ? '#ffc800' : '#ff4444');
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [pct, 100 - pct],
+                backgroundColor: [color, '#1e1e3a'],
+                borderWidth: 0,
+                circumference: 180,
+                rotation: 270
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '72%',
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            animation: { animateRotate: true, duration: 900 }
+        }
+    });
+}
+
+function makeMonthlyBar(canvasId, data, target, unit = '%', lowerIsBetter = false) {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Actual',
+                    data,
+                    backgroundColor: data.map(v =>
+                        (lowerIsBetter ? v <= target : v >= target)
+                            ? 'rgba(116,185,255,0.75)'
+                            : 'rgba(255,68,68,0.75)'),
+                    borderRadius: 4,
+                    order: 2
+                },
+                {
+                    label: `Target (${target}${unit})`,
+                    data: Array(12).fill(target),
+                    type: 'line',
+                    borderColor: '#ffc800',
+                    borderDash: [5,4],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    tension: 0,
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#8888aa', boxWidth: 10, font: { size: 10 } } },
+                tooltip: { callbacks: { label: c => ` ${c.parsed.y}${unit}` } }
+            },
+            scales: {
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
+            }
+        }
+    });
+}
+
+function makeBar(canvasId, labels, data, target, label, lowerIsBetter = true) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label,
+                data,
+                backgroundColor: data.map(v =>
+                    (lowerIsBetter ? v <= target : v >= target)
+                        ? 'rgba(116,185,255,0.7)'
+                        : 'rgba(255,68,68,0.7)'),
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => ` ${c.parsed.y}` } }
+            },
+            scales: {
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
+            }
+        }
+    });
+}
+
+function makeLine(canvasId, labels, datasets) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#8888aa', boxWidth: 10, font: { size: 10 } } } },
+            scales: {
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
+            }
+        }
+    });
+}
+
+function makeGroupedBar(canvasId, labels, datasets) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: { labels, datasets },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#8888aa', boxWidth: 10, font: { size: 10 } } } },
+            scales: {
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
+            }
+        }
+    });
+}
+
+function makeSecondaryTable(tbodyId, rows) {
+    const el = document.getElementById(tbodyId);
+    if (!el) return;
+    el.innerHTML = rows.map(r => {
+        let status = '⚫ No Data';
+        let statusColor = '#555577';
+        if (r.value === 'TBD' || r.target === 'TBD' || r.value === '—') {
+            status = '⚫ No Data'; statusColor = '#555577';
+        } else {
+            const rawVal    = parseFloat(r.value.replace(/[^0-9.-]/g, ''));
+            const rawTarget = parseFloat(r.target.replace(/[^0-9.-]/g, ''));
+            const isLower   = r.target.startsWith('<');
+            const isHigher  = r.target.startsWith('≥') || r.target.startsWith('>');
+            if (!isNaN(rawVal) && !isNaN(rawTarget)) {
+                if (isLower) {
+                    if (rawVal <= rawTarget)             { status = '🟢 On Track'; statusColor = '#00d464'; }
+                    else if (rawVal <= rawTarget * 1.2)  { status = '🟡 Monitor';  statusColor = '#ffc800'; }
+                    else                                 { status = '🔴 At Risk';  statusColor = '#ff4444'; }
+                } else if (isHigher) {
+                    if (rawVal >= rawTarget)             { status = '🟢 On Track'; statusColor = '#00d464'; }
+                    else if (rawVal >= rawTarget * 0.97) { status = '🟡 Monitor';  statusColor = '#ffc800'; }
+                    else                                 { status = '🔴 At Risk';  statusColor = '#ff4444'; }
+                } else {
+                    status = rawVal === rawTarget ? '🟢 On Track' : '🔴 At Risk';
+                    statusColor = rawVal === rawTarget ? '#00d464' : '#ff4444';
+                }
+            }
+        }
+        return `
+        <tr>
+            <td>${r.name}</td>
+            <td style="text-align:center; font-weight:600; color:#fff;">${r.value}</td>
+            <td style="text-align:center; color:#8888aa;">${r.target}</td>
+            <td style="text-align:center; color:${statusColor}; font-weight:600;">${status}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ══════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════
+
+const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const days7  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+// Secondary KPI tables
+const matSecondary = [
+    { name: 'Aging Inventory',                      value: '—',      target: 'TBD'    },
+    { name: 'Inventory — SLOC $s',                  value: '$142K',  target: 'TBD'    },
+    { name: 'Inventory — Days on Hand / Turns',     value: '18 days',target: '< 15'   },
+    { name: 'Inventory — By Raw Material / Part',   value: '—',      target: 'TBD'    },
+    { name: 'Raw Material Vendor Compliance',        value: '91%',    target: '≥ 95%'  },
+    { name: 'Raw Material Inspection Results',       value: '2.1%',   target: '< 2%'   },
+    { name: 'Count of Open Bundles',                value: '14',     target: '0'      },
+    { name: 'COGI',                                 value: '3',      target: '0'      },
+];
+
+const smSecondary = [
+    { name: 'Sequence Changes',                     value: '8',      target: '0'      },
+    { name: 'Requests Turn Around Time',            value: '2.4 hrs',target: '< 2 hrs'},
+    { name: 'Sequence Adherence',                   value: '93%',    target: '≥ 95%'  },
+    { name: 'DMM Time Since ROP Triggered',         value: '1.2 days',target: '< 1 day'},
+    { name: 'TR/TO Conversion Time',                value: '3.1 hrs',target: '< 2 hrs'},
+    { name: '6S Score',                             value: '87%',    target: '≥ 90%'  },
+    { name: 'TR/TO Compliance',                     value: '89%',    target: '≥ 95%'  },
+    { name: 'Inbound Audit Defect Rate',            value: '1.8%',   target: '< 2%'   },
+    { name: 'Put Away Time',                        value: '1.4 hrs',target: '< 2 hrs'},
+    { name: 'Kit Pick Time',                        value: '2.3 hrs',target: '< 2 hrs'},
+    { name: 'Inventory Cycle Count Accuracy',       value: '93%',    target: '≥ 95%'  },
+    { name: 'Inventory Cycle Count SLOC $s',        value: '$88K',   target: 'TBD'    },
+    { name: 'Kit Delivery Time',                    value: '1.8 hrs',target: '< 2 hrs'},
+    { name: 'COGI',                                 value: '2',      target: '0'      },
+];
+
+const whSecondary = [
+    { name: 'CPI (Labor Efficiency)',               value: '88%',    target: '≥ 85%'  },
+    { name: 'Cycle Count Accuracy',                 value: '94%',    target: '≥ 95%'  },
+    { name: 'Results from Parts ID Inspection',     value: '96%',    target: '≥ 98%'  },
+    { name: 'Sequence Changes',                     value: '5',      target: '0'      },
+    { name: 'VLM Fill Percentage',                  value: '78%',    target: '≥ 80%'  },
+    { name: 'VLM Part Turns',                       value: '4.2',    target: '> 5'    },
+    { name: 'Aging Breaker/Cradle Requests',        value: '3.1 days',target: '< 2 days'},
+    { name: 'Customer Supplied Parts Received',     value: '142',    target: 'TBD'    },
+    { name: 'Customer Supplied Parts Reordered',    value: '18',     target: 'TBD'    },
+    { name: 'Deliveries Unload Time',               value: '1.9 hrs',target: '< 2 hrs'},
+    { name: 'RTS — $s',                             value: '$3,200', target: '< $2,000'},
+];
+
+const shSecondary = [
+    { name: 'Ship Requests Count',                  value: '48',     target: 'TBD'    },
+    { name: 'Ship Requests Aging',                  value: '1.8 days',target: '< 2 days'},
+    { name: 'Ship Requests Execution',              value: '2.4 days',target: '< 2 days'},
+    { name: 'Ship Loose Quantity',                  value: '12',     target: '0'      },
+    { name: 'Ship Address Blocks / Missing',        value: '3',      target: '0'      },
+    { name: 'Storage Requests Count',               value: '22',     target: 'TBD'    },
+    { name: 'Storage Requests 1000 — Cost',         value: '$1,400', target: 'TBD'    },
+    { name: 'SAP 602 Time to Process',              value: '1.8 hrs',target: '< 2 hrs'},
+    { name: 'SAP 602 % Unconfirmed',                value: '4.2%',   target: '0%'     },
+    { name: 'SAP 101 % Unconfirmed',                value: '2.8%',   target: '0%'     },
+    { name: 'SAP 101 Line-Up Count',                value: '31',     target: 'TBD'    },
+    { name: 'SAP 101 % Incomplete Line Ups',        value: '3.1%',   target: '0%'     },
+    { name: 'Raw Material Deliveries Count',        value: '67',     target: 'TBD'    },
+];
+
+// ══════════════════════════════════════════
+//  BUILD CHARTS
+// ══════════════════════════════════════════
+window.addEventListener('load', () => {
+
+    // ── MATERIALS ──
+    makeGauge('mat-countGauge',  96.2, 95);
+    makeGauge('mat-dollarGauge', 98.5, 98);
+
+    makeMonthlyBar('mat-adjChart',
+        [1.4,1.8,2.1,1.6,2.3,1.9,1.7,2.4,1.5,1.8,2.0,1.6], 2, '%', true);
+
+    makeMonthlyBar('mat-inspChart',
+        [1.8,2.2,1.5,2.8,1.9,1.4,2.1,1.7,2.3,1.6,1.9,2.0], 2, '%', true);
+
+    makeSecondaryTable('mat-secondary', matSecondary);
+
+    // ── SUPERMARKET ──
+    makeGauge('sm-waterGauge',  91.4, 95);
+    makeGauge('sm-kitAccGauge', 98.7, 100);
+
+    makeMonthlyBar('sm-kitAgingChart',
+        [1.8,2.1,1.5,2.4,1.9,1.6,2.2,1.7,2.0,1.4,1.8,2.1], 2, ' days', true);
+
+    makeMonthlyBar('sm-seqChart',
+        [94,96,93,97,95,94,96,93,95,97,94,93], 95, '%');
+
+    makeMonthlyBar('sm-tatChart',
+        [2.1,1.8,2.4,1.9,2.2,1.7,2.5,2.0,1.8,2.3,1.9,2.1], 2, ' hrs', true);
+
+    makeSecondaryTable('sm-secondary', smSecondary);
+
+    // ── WAREHOUSE ──
+    makeGauge('wh-waterGauge', 96.1, 95);
+    makeGauge('wh-kitAccGauge',99.1, 100);
+    makeGauge('wh-vlmGauge',   78.4, 80);
+    makeGauge('wh-cycleGauge', 94.3, 95);
+    makeGauge('wh-cpiGauge',   88.1, 85);
+
+    makeMonthlyBar('wh-kitAgingChart',
+        [1.6,1.9,1.4,2.1,1.7,1.5,2.0,1.8,1.6,2.2,1.7,1.9], 2, ' days', true);
+
+    makeBar('wh-agingReqChart', days7,
+        [1.8,3.2,1.5,2.8,1.2,2.5,1.9], 2, 'Days');
+
+    makeMonthlyBar('wh-vlmTurnsChart',
+        [4.1,4.5,3.9,4.8,5.1,4.7,4.3,5.2,4.6,4.9,4.4,4.8], 5, ' turns', false);
+
+    makeMonthlyBar('wh-unloadChart',
+        [1.8,2.1,1.6,2.3,1.9,1.7,2.2,1.8,2.0,1.5,1.9,2.1], 2, ' hrs', true);
+
+    makeSecondaryTable('wh-secondary', whSecondary);
+
+    // ── SHIPPING ──
+    makeGroupedBar('sh-shippedChart', months, [
+        { label: 'SWBD', data: [42,38,45,41,43,39,44,40,46,42,38,44],
+          backgroundColor: 'rgba(116,185,255,0.7)', borderRadius: 4 },
+        { label: 'LVSG', data: [28,31,27,33,29,30,32,28,34,30,27,31],
+          backgroundColor: 'rgba(0,212,170,0.7)',   borderRadius: 4 },
+        { label: 'PP',   data: [35,32,38,36,34,37,33,36,39,35,32,37],
+          backgroundColor: 'rgba(162,155,254,0.7)', borderRadius: 4 }
+    ]);
+
+    makeMonthlyBar('sh-storageAgingChart',
+        [1.4,1.8,2.1,1.6,2.3,1.9,1.5,2.2,1.7,2.0,1.8,1.6], 2, ' days', true);
+
+    makeMonthlyBar('sh-reqAgingChart',
+        [1.6,2.0,1.8,2.4,1.7,1.9,2.1,1.5,2.3,1.8,1.6,2.0], 2, ' days', true);
+
+    makeMonthlyBar('sh-execChart',
+        [2.1,1.9,2.4,1.8,2.2,1.7,2.5,2.0,1.8,2.3,1.9,2.1], 2, ' days', true);
+
+    makeMonthlyBar('sh-looseChart',
+        [14,11,16,12,18,10,15,13,17,11,14,12], 0, ' units', true);
+
+    makeSecondaryTable('sh-secondary', shSecondary);
+
+});
+</script>
+</body>
+</html>
