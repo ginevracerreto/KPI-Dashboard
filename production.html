@@ -6,7 +6,6 @@
     <title>Production Dashboard – Siemens</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ── Reset & Base ── */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -19,290 +18,187 @@
         /* ── Header ── */
         header {
             background: linear-gradient(135deg, #00d4aa 0%, #007a6e 100%);
-            padding: 18px 32px;
+            padding: 14px 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 2px 12px rgba(0,212,170,0.3);
         }
 
-        header h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #fff;
-            letter-spacing: 1px;
-        }
+        header h1 { font-size: 1.3rem; font-weight: 700; color: #fff; letter-spacing: 1px; }
 
         .back-btn {
             background: rgba(255,255,255,0.15);
             border: 1px solid rgba(255,255,255,0.3);
             color: #fff;
-            padding: 8px 18px;
+            padding: 6px 16px;
             border-radius: 20px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             text-decoration: none;
             transition: background 0.2s;
         }
-
         .back-btn:hover { background: rgba(255,255,255,0.28); }
 
         /* ── Tabs ── */
         .tabs-wrapper {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            padding: 28px 32px 0;
+            gap: 10px;
+            padding: 18px 28px 0;
         }
 
         .tab-btn {
-            padding: 10px 36px;
+            padding: 8px 30px;
             border-radius: 24px;
             border: 2px solid #00d4aa;
             background: transparent;
             color: #00d4aa;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.25s;
             letter-spacing: 1px;
         }
-
         .tab-btn:hover { background: rgba(0,212,170,0.12); }
+        .tab-btn.active { background: #00d4aa; color: #0a0a1a; }
 
-        .tab-btn.active {
-            background: #00d4aa;
-            color: #0a0a1a;
-        }
-
-        /* ── Main Content ── */
-        .dashboard {
-            display: none;
-            padding: 28px 32px 48px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        /* ── Dashboard wrapper ── */
+        .dashboard { display: none; padding: 16px 24px 40px; max-width: 1400px; margin: 0 auto; }
         .dashboard.active { display: block; }
 
         /* ── Section Label ── */
         .section-label {
-            font-size: 0.72rem;
+            font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: #00d4aa;
-            margin: 28px 0 12px;
+            margin: 20px 0 10px;
             border-left: 3px solid #00d4aa;
-            padding-left: 10px;
+            padding-left: 8px;
         }
 
-        /* ── KPI Grid ── */
-        .kpi-grid {
+        /* ══════════════════════════════
+           MAIN GRID — 4 columns
+        ══════════════════════════════ */
+        .main-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 8px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
 
-        /* ── KPI Card ── */
-        .kpi-card {
-            background: #12122a;
-            border: 1px solid #1e1e3a;
-            border-radius: 14px;
-            padding: 20px 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+        /* span helpers */
+        .col-1 { grid-column: span 1; }
+        .col-2 { grid-column: span 2; }
+        .col-4 { grid-column: span 4; }
 
-        .kpi-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,212,170,0.15);
-        }
-
-        .kpi-card .kpi-title {
-            font-size: 0.78rem;
-            color: #8888aa;
-            text-align: center;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-card .kpi-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .kpi-card .kpi-target {
-            font-size: 0.72rem;
-            color: #555577;
-        }
-
-        .kpi-card .kpi-badge {
-            font-size: 0.7rem;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-weight: 700;
-        }
-
-        .badge-green { background: rgba(0,212,100,0.15); color: #00d464; }
-        .badge-red   { background: rgba(255,60,60,0.15);  color: #ff4444; }
-        .badge-yellow{ background: rgba(255,200,0,0.15);  color: #ffc800; }
-
-        /* ── Gauge Container ── */
-        .gauge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
-        .gauge-card {
-            background: #12122a;
-            border: 1px solid #1e1e3a;
-            border-radius: 14px;
-            padding: 20px 16px 14px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .gauge-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,212,170,0.15);
-        }
-
-        .gauge-card .gauge-title {
-            font-size: 0.78rem;
-            color: #8888aa;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .gauge-card canvas { max-width: 160px; }
-
-        .gauge-card .gauge-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #fff;
-            margin-top: -8px;
-        }
-
-        .gauge-card .gauge-target {
-            font-size: 0.7rem;
-            color: #555577;
-        }
-
-        /* ── Chart Cards ── */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 16px;
-        }
-
+        /* ── Chart Card ── */
         .chart-card {
             background: #12122a;
             border: 1px solid #1e1e3a;
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 14px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-
         .chart-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,212,170,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,212,170,0.12);
         }
 
-        .chart-card .chart-title {
-            font-size: 0.82rem;
+        .chart-title {
+            font-size: 0.72rem;
             color: #8888aa;
             font-weight: 600;
-            margin-bottom: 14px;
-            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            letter-spacing: 0.4px;
         }
 
-        .chart-card.full-width {
-            grid-column: 1 / -1;
+        /* ── Gauge Card (small) ── */
+        .gauge-card {
+            background: #12122a;
+            border: 1px solid #1e1e3a;
+            border-radius: 12px;
+            padding: 12px 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        .gauge-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,212,170,0.12);
+        }
+        .gauge-title {
+            font-size: 0.68rem;
+            color: #8888aa;
+            text-align: center;
+            font-weight: 600;
+        }
+        .gauge-card canvas { max-width: 110px; }
+        .gauge-value { font-size: 1.2rem; font-weight: 700; color: #fff; margin-top: -10px; }
+        .gauge-target { font-size: 0.62rem; color: #555577; }
 
-        /* ── Progress Bar ── */
-        .progress-list { display: flex; flex-direction: column; gap: 12px; }
+        /* ── KPI Stat Card ── */
+        .kpi-card {
+            background: #12122a;
+            border: 1px solid #1e1e3a;
+            border-radius: 12px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,212,170,0.12);
+        }
+        .kpi-title  { font-size: 0.68rem; color: #8888aa; text-align: center; font-weight: 600; }
+        .kpi-value  { font-size: 1.7rem; font-weight: 700; color: #fff; }
+        .kpi-target { font-size: 0.62rem; color: #555577; }
+        .kpi-badge  { font-size: 0.62rem; padding: 2px 8px; border-radius: 8px; font-weight: 700; }
+        .badge-green  { background: rgba(0,212,100,0.15); color: #00d464; }
+        .badge-red    { background: rgba(255,60,60,0.15);  color: #ff4444; }
+        .badge-yellow { background: rgba(255,200,0,0.15);  color: #ffc800; }
 
-        .progress-item {}
-
+        /* ── Progress Bars ── */
+        .progress-list { display: flex; flex-direction: column; gap: 8px; }
         .progress-header {
             display: flex;
             justify-content: space-between;
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             color: #aaaacc;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
-
-        .progress-bar-bg {
-            background: #1e1e3a;
-            border-radius: 6px;
-            height: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            border-radius: 6px;
-            transition: width 1s ease;
-        }
-
+        .progress-bar-bg { background: #1e1e3a; border-radius: 4px; height: 8px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
         .fill-green  { background: linear-gradient(90deg, #00d4aa, #00d464); }
         .fill-yellow { background: linear-gradient(90deg, #ffc800, #ff9900); }
         .fill-red    { background: linear-gradient(90deg, #ff4444, #ff0000); }
 
         /* ── Secondary Table ── */
-        .secondary-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
-
+        .secondary-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
         .secondary-table th {
             background: #1a1a35;
             color: #00d4aa;
-            padding: 10px 14px;
+            padding: 8px 12px;
             text-align: left;
             font-weight: 700;
             letter-spacing: 0.5px;
         }
-
-        .secondary-table td {
-            padding: 9px 14px;
-            border-bottom: 1px solid #1e1e3a;
-            color: #cccce0;
-        }
-
+        .secondary-table td { padding: 7px 12px; border-bottom: 1px solid #1e1e3a; color: #cccce0; }
         .secondary-table tr:hover td { background: #16163a; }
-
-        .dot {
-            display: inline-block;
-            width: 9px; height: 9px;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
-
-        .dot-green  { background: #00d464; }
-        .dot-yellow { background: #ffc800; }
-        .dot-red    { background: #ff4444; }
-        .dot-grey   { background: #555577; }
 
         /* ── Footer ── */
         .dash-footer {
             text-align: center;
             color: #333355;
-            font-size: 0.72rem;
-            padding: 16px;
-            margin-top: 8px;
+            font-size: 0.68rem;
+            padding: 14px;
+            margin-top: 6px;
         }
     </style>
 </head>
@@ -322,312 +218,296 @@
 </div>
 
 <!-- ════════════════════════════════════════
-     SWBD DASHBOARD
+     SWBD
 ════════════════════════════════════════ -->
 <div id="tab-SWBD" class="dashboard active">
 
-    <!-- ── QUALITY ── -->
-    <div class="section-label">Quality</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
-            <div class="gauge-title">First Pass Yield</div>
-            <canvas id="swbd-fpyGauge"></canvas>
-            <div class="gauge-value" id="swbd-fpyVal">96.2%</div>
-            <div class="gauge-target">Target ≥ 98%</div>
-        </div>
-    </div>
+    <!-- QUALITY + DELIVERY top row -->
+    <div class="section-label">Quality & Delivery</div>
+    <div class="main-grid">
 
-    <!-- ── DELIVERY ── -->
-    <div class="section-label">Delivery</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
-            <div class="gauge-title">Delivery Reliability</div>
-            <canvas id="swbd-drGauge"></canvas>
-            <div class="gauge-value" id="swbd-drVal">97.1%</div>
-            <div class="gauge-target">Target ≥ 95%</div>
+        <!-- First Pass Yield — monthly bar -->
+        <div class="chart-card col-2">
+            <div class="chart-title">✅ First Pass Yield — Monthly (Target ≥ 98%)</div>
+            <canvas id="swbd-fpyChart" height="130"></canvas>
         </div>
-        <div class="gauge-card">
+
+        <!-- Delivery Reliability — monthly bar -->
+        <div class="chart-card col-2">
+            <div class="chart-title">🚚 Delivery Reliability — Monthly (Target ≥ 95%)</div>
+            <canvas id="swbd-drChart" height="130"></canvas>
+        </div>
+
+        <!-- Sequence Adherence gauge (small) -->
+        <div class="gauge-card col-1">
             <div class="gauge-title">Sequence Adherence</div>
             <canvas id="swbd-seqGauge"></canvas>
             <div class="gauge-value" id="swbd-seqVal">93.4%</div>
             <div class="gauge-target">Target ≥ 95%</div>
         </div>
-    </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
+        <!-- Aging Into Sequence -->
+        <div class="chart-card col-2">
+            <div class="chart-title">📅 Aging Into Sequence — Days (Target &lt; 2)</div>
+            <canvas id="swbd-agingSeqChart" height="110"></canvas>
+        </div>
+
         <!-- Aging WIP -->
-        <div class="chart-card">
-            <div class="chart-title">⏱ Aging WIP — Hours at Step (Target &lt; 6 hrs)</div>
+        <div class="chart-card col-1">
+            <div class="chart-title">⏱ Aging WIP — Hrs at Step (Target &lt; 6)</div>
             <div class="progress-list" id="swbd-agingWip"></div>
         </div>
-        <!-- Aging Into Sequence -->
-        <div class="chart-card">
-            <div class="chart-title">📅 Aging Into Sequence — Days (Target &lt; 2 days)</div>
-            <canvas id="swbd-agingSeqChart" height="160"></canvas>
-        </div>
+
     </div>
 
-    <!-- Gear Output -->
+    <!-- THROUGHPUT -->
     <div class="section-label">Throughput</div>
-    <div class="chart-grid">
-        <div class="chart-card full-width">
+    <div class="main-grid">
+        <div class="chart-card col-4">
             <div class="chart-title">⚙️ Gear Output — Units per Shift (Last 7 Days)</div>
-            <canvas id="swbd-gearChart" height="100"></canvas>
+            <canvas id="swbd-gearChart" height="80"></canvas>
         </div>
     </div>
 
-    <!-- ── PRODUCTIVITY ── -->
+    <!-- PRODUCTIVITY & COST -->
     <div class="section-label">Productivity & Cost</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
+    <div class="main-grid">
+
+        <!-- Employee Utilization gauge (small) -->
+        <div class="gauge-card col-1">
             <div class="gauge-title">Employee Utilization</div>
             <canvas id="swbd-utilGauge"></canvas>
             <div class="gauge-value" id="swbd-utilVal">88.3%</div>
             <div class="gauge-target">Target ≥ 85%</div>
         </div>
-    </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
         <!-- Productivity YOY -->
-        <div class="chart-card">
-            <div class="chart-title">📈 Productivity YOY (%) — Monthly (Target &gt; 5%)</div>
-            <canvas id="swbd-yoyChart" height="160"></canvas>
+        <div class="chart-card col-2">
+            <div class="chart-title">📈 Productivity YOY % — Monthly (Target &gt; 5%)</div>
+            <canvas id="swbd-yoyChart" height="110"></canvas>
         </div>
-        <!-- Scans Accuracy -->
-        <div class="chart-card">
-            <div class="chart-title">🔍 Scans Accuracy — Associates with 0 Scans / Day</div>
-            <canvas id="swbd-scansChart" height="160"></canvas>
-        </div>
-    </div>
 
-    <!-- KPI stat cards -->
-    <div class="kpi-grid" style="margin-top:16px;">
-        <div class="kpi-card">
-            <div class="kpi-title">Scans &gt; 2 hrs (Today)</div>
+        <!-- Scans bar -->
+        <div class="chart-card col-2">
+            <div class="chart-title">🔍 Scans Accuracy — Associates with 0 Scans / Day</div>
+            <canvas id="swbd-scansChart" height="110"></canvas>
+        </div>
+
+        <!-- Scans stat cards -->
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Scans &gt; 2 hrs Today</div>
             <div class="kpi-value">3</div>
             <div class="kpi-target">Target: 0</div>
             <span class="kpi-badge badge-red">⚠ Above Target</span>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Associates 0 Scans (This Week)</div>
+
+        <div class="kpi-card col-1">
+            <div class="kpi-title">0-Scan Associates This Week</div>
             <div class="kpi-value">7</div>
             <div class="kpi-target">Target: 0</div>
             <span class="kpi-badge badge-red">⚠ Above Target</span>
         </div>
+
     </div>
 
-    <!-- ── SECONDARY KPIs ── -->
+    <!-- SECONDARY -->
     <div class="section-label">Secondary KPIs — Status Overview</div>
-    <div class="chart-card full-width" style="padding:0; overflow:hidden;">
-        <table class="secondary-table">
-            <thead>
-                <tr>
-                    <th>KPI</th>
-                    <th>Category</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="swbd-secondary"></tbody>
-        </table>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead><tr><th>KPI</th><th>Category</th><th>Status</th></tr></thead>
+                <tbody id="swbd-secondary"></tbody>
+            </table>
+        </div>
     </div>
 
-</div><!-- end SWBD -->
+</div><!-- /SWBD -->
 
 <!-- ════════════════════════════════════════
-     LVSG DASHBOARD
+     LVSG
 ════════════════════════════════════════ -->
 <div id="tab-LVSG" class="dashboard">
 
-    <div class="section-label">Quality</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
-            <div class="gauge-title">First Pass Yield</div>
-            <canvas id="lvsg-fpyGauge"></canvas>
-            <div class="gauge-value" id="lvsg-fpyVal">98.5%</div>
-            <div class="gauge-target">Target ≥ 98%</div>
-        </div>
-    </div>
+    <div class="section-label">Quality & Delivery</div>
+    <div class="main-grid">
 
-    <div class="section-label">Delivery</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
-            <div class="gauge-title">Delivery Reliability</div>
-            <canvas id="lvsg-drGauge"></canvas>
-            <div class="gauge-value" id="lvsg-drVal">95.8%</div>
-            <div class="gauge-target">Target ≥ 95%</div>
+        <div class="chart-card col-2">
+            <div class="chart-title">✅ First Pass Yield — Monthly (Target ≥ 98%)</div>
+            <canvas id="lvsg-fpyChart" height="130"></canvas>
         </div>
-        <div class="gauge-card">
+
+        <div class="chart-card col-2">
+            <div class="chart-title">🚚 Delivery Reliability — Monthly (Target ≥ 95%)</div>
+            <canvas id="lvsg-drChart" height="130"></canvas>
+        </div>
+
+        <div class="gauge-card col-1">
             <div class="gauge-title">Sequence Adherence</div>
             <canvas id="lvsg-seqGauge"></canvas>
             <div class="gauge-value" id="lvsg-seqVal">96.2%</div>
             <div class="gauge-target">Target ≥ 95%</div>
         </div>
-    </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
-        <div class="chart-card">
-            <div class="chart-title">⏱ Aging WIP — Hours at Step (Target &lt; 6 hrs)</div>
+        <div class="chart-card col-2">
+            <div class="chart-title">📅 Aging Into Sequence — Days (Target &lt; 2)</div>
+            <canvas id="lvsg-agingSeqChart" height="110"></canvas>
+        </div>
+
+        <div class="chart-card col-1">
+            <div class="chart-title">⏱ Aging WIP — Hrs at Step (Target &lt; 6)</div>
             <div class="progress-list" id="lvsg-agingWip"></div>
         </div>
-        <div class="chart-card">
-            <div class="chart-title">📅 Aging Into Sequence — Days (Target &lt; 2 days)</div>
-            <canvas id="lvsg-agingSeqChart" height="160"></canvas>
-        </div>
+
     </div>
 
     <div class="section-label">Throughput</div>
-    <div class="chart-grid">
-        <div class="chart-card full-width">
+    <div class="main-grid">
+        <div class="chart-card col-4">
             <div class="chart-title">⚙️ Gear Output — Units per Shift (Last 7 Days)</div>
-            <canvas id="lvsg-gearChart" height="100"></canvas>
+            <canvas id="lvsg-gearChart" height="80"></canvas>
         </div>
     </div>
 
     <div class="section-label">Productivity & Cost</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
+    <div class="main-grid">
+
+        <div class="gauge-card col-1">
             <div class="gauge-title">Employee Utilization</div>
             <canvas id="lvsg-utilGauge"></canvas>
             <div class="gauge-value" id="lvsg-utilVal">82.1%</div>
             <div class="gauge-target">Target ≥ 85%</div>
         </div>
-    </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
-        <div class="chart-card">
-            <div class="chart-title">📈 Productivity YOY (%) — Monthly (Target &gt; 5%)</div>
-            <canvas id="lvsg-yoyChart" height="160"></canvas>
+        <div class="chart-card col-2">
+            <div class="chart-title">📈 Productivity YOY % — Monthly (Target &gt; 5%)</div>
+            <canvas id="lvsg-yoyChart" height="110"></canvas>
         </div>
-        <div class="chart-card">
+
+        <div class="chart-card col-2">
             <div class="chart-title">🔍 Scans Accuracy — Associates with 0 Scans / Day</div>
-            <canvas id="lvsg-scansChart" height="160"></canvas>
+            <canvas id="lvsg-scansChart" height="110"></canvas>
         </div>
-    </div>
 
-    <div class="kpi-grid" style="margin-top:16px;">
-        <div class="kpi-card">
-            <div class="kpi-title">Scans &gt; 2 hrs (Today)</div>
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Scans &gt; 2 hrs Today</div>
             <div class="kpi-value">1</div>
             <div class="kpi-target">Target: 0</div>
             <span class="kpi-badge badge-red">⚠ Above Target</span>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Associates 0 Scans (This Week)</div>
+
+        <div class="kpi-card col-1">
+            <div class="kpi-title">0-Scan Associates This Week</div>
             <div class="kpi-value">4</div>
             <div class="kpi-target">Target: 0</div>
             <span class="kpi-badge badge-red">⚠ Above Target</span>
         </div>
+
     </div>
 
     <div class="section-label">Secondary KPIs — Status Overview</div>
-    <div class="chart-card full-width" style="padding:0; overflow:hidden;">
-        <table class="secondary-table">
-            <thead>
-                <tr><th>KPI</th><th>Category</th><th>Status</th></tr>
-            </thead>
-            <tbody id="lvsg-secondary"></tbody>
-        </table>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead><tr><th>KPI</th><th>Category</th><th>Status</th></tr></thead>
+                <tbody id="lvsg-secondary"></tbody>
+            </table>
+        </div>
     </div>
 
-</div><!-- end LVSG -->
+</div><!-- /LVSG -->
 
 <!-- ════════════════════════════════════════
-     PP DASHBOARD
+     PP
 ════════════════════════════════════════ -->
 <div id="tab-PP" class="dashboard">
 
-    <div class="section-label">Quality</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
-            <div class="gauge-title">First Pass Yield</div>
-            <canvas id="pp-fpyGauge"></canvas>
-            <div class="gauge-value" id="pp-fpyVal">97.0%</div>
-            <div class="gauge-target">Target ≥ 98%</div>
-        </div>
-    </div>
+    <div class="section-label">Quality & Delivery</div>
+    <div class="main-grid">
 
-    <div class="section-label">Delivery</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
-            <div class="gauge-title">Delivery Reliability</div>
-            <canvas id="pp-drGauge"></canvas>
-            <div class="gauge-value" id="pp-drVal">94.2%</div>
-            <div class="gauge-target">Target ≥ 95%</div>
+        <div class="chart-card col-2">
+            <div class="chart-title">✅ First Pass Yield — Monthly (Target ≥ 98%)</div>
+            <canvas id="pp-fpyChart" height="130"></canvas>
         </div>
-        <div class="gauge-card">
+
+        <div class="chart-card col-2">
+            <div class="chart-title">🚚 Delivery Reliability — Monthly (Target ≥ 95%)</div>
+            <canvas id="pp-drChart" height="130"></canvas>
+        </div>
+
+        <div class="gauge-card col-1">
             <div class="gauge-title">Sequence Adherence</div>
             <canvas id="pp-seqGauge"></canvas>
             <div class="gauge-value" id="pp-seqVal">95.9%</div>
             <div class="gauge-target">Target ≥ 95%</div>
         </div>
-    </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
-        <div class="chart-card">
-            <div class="chart-title">⏱ Aging WIP — Hours at Step (Target &lt; 6 hrs)</div>
+        <div class="chart-card col-2">
+            <div class="chart-title">📅 Aging Into Sequence — Days (Target &lt; 2)</div>
+            <canvas id="pp-agingSeqChart" height="110"></canvas>
+        </div>
+
+        <div class="chart-card col-1">
+            <div class="chart-title">⏱ Aging WIP — Hrs at Step (Target &lt; 6)</div>
             <div class="progress-list" id="pp-agingWip"></div>
         </div>
-        <div class="chart-card">
-            <div class="chart-title">📅 Aging Into Sequence — Days (Target &lt; 2 days)</div>
-            <canvas id="pp-agingSeqChart" height="160"></canvas>
-        </div>
+
     </div>
 
     <div class="section-label">Throughput</div>
-    <div class="chart-grid">
-        <div class="chart-card full-width">
+    <div class="main-grid">
+        <div class="chart-card col-4">
             <div class="chart-title">⚙️ Gear Output — Units per Shift (Last 7 Days)</div>
-            <canvas id="pp-gearChart" height="100"></canvas>
+            <canvas id="pp-gearChart" height="80"></canvas>
         </div>
     </div>
 
     <div class="section-label">Productivity & Cost</div>
-    <div class="gauge-grid">
-        <div class="gauge-card">
+    <div class="main-grid">
+
+        <div class="gauge-card col-1">
             <div class="gauge-title">Employee Utilization</div>
             <canvas id="pp-utilGauge"></canvas>
             <div class="gauge-value" id="pp-utilVal">86.7%</div>
             <div class="gauge-target">Target ≥ 85%</div>
         </div>
-    </div>
 
-    <div class="chart-grid" style="margin-top:16px;">
-        <div class="chart-card">
-            <div class="chart-title">📈 Productivity YOY (%) — Monthly (Target &gt; 5%)</div>
-            <canvas id="pp-yoyChart" height="160"></canvas>
+        <div class="chart-card col-2">
+            <div class="chart-title">📈 Productivity YOY % — Monthly (Target &gt; 5%)</div>
+            <canvas id="pp-yoyChart" height="110"></canvas>
         </div>
-        <div class="chart-card">
+
+        <div class="chart-card col-2">
             <div class="chart-title">🔍 Scans Accuracy — Associates with 0 Scans / Day</div>
-            <canvas id="pp-scansChart" height="160"></canvas>
+            <canvas id="pp-scansChart" height="110"></canvas>
         </div>
-    </div>
 
-    <div class="kpi-grid" style="margin-top:16px;">
-        <div class="kpi-card">
-            <div class="kpi-title">Scans &gt; 2 hrs (Today)</div>
+        <div class="kpi-card col-1">
+            <div class="kpi-title">Scans &gt; 2 hrs Today</div>
             <div class="kpi-value">0</div>
             <div class="kpi-target">Target: 0</div>
             <span class="kpi-badge badge-green">✓ On Target</span>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Associates 0 Scans (This Week)</div>
+
+        <div class="kpi-card col-1">
+            <div class="kpi-title">0-Scan Associates This Week</div>
             <div class="kpi-value">2</div>
             <div class="kpi-target">Target: 0</div>
             <span class="kpi-badge badge-red">⚠ Above Target</span>
         </div>
+
     </div>
 
     <div class="section-label">Secondary KPIs — Status Overview</div>
-    <div class="chart-card full-width" style="padding:0; overflow:hidden;">
-        <table class="secondary-table">
-            <thead>
-                <tr><th>KPI</th><th>Category</th><th>Status</th></tr>
-            </thead>
-            <tbody id="pp-secondary"></tbody>
-        </table>
+    <div class="main-grid">
+        <div class="chart-card col-4" style="padding:0; overflow:hidden;">
+            <table class="secondary-table">
+                <thead><tr><th>KPI</th><th>Category</th><th>Status</th></tr></thead>
+                <tbody id="pp-secondary"></tbody>
+            </table>
+        </div>
     </div>
 
-</div><!-- end PP -->
+</div><!-- /PP -->
 
 <div class="dash-footer">Siemens Internal Dashboard · Mock Data · Refresh: Daily</div>
 
@@ -643,12 +523,14 @@ function switchTab(name, btn) {
     btn.classList.add('active');
 }
 
-// Gauge chart (doughnut half)
+// ── Gauge (half doughnut) ──
 function makeGauge(canvasId, value, target, isLowerBetter = false) {
     const pct   = Math.min(value, 100);
     const good  = isLowerBetter ? value <= target : value >= target;
-    const color = good ? '#00d4aa' : (Math.abs(value - target) < 3 ? '#ffc800' : '#ff4444');
-    const ctx   = document.getElementById(canvasId);
+    const color = good
+        ? '#00d4aa'
+        : (Math.abs(value - target) < 3 ? '#ffc800' : '#ff4444');
+    const ctx = document.getElementById(canvasId);
     if (!ctx) return;
     new Chart(ctx, {
         type: 'doughnut',
@@ -670,8 +552,61 @@ function makeGauge(canvasId, value, target, isLowerBetter = false) {
     });
 }
 
-// Bar chart
-function makeBar(canvasId, labels, data, target, color, label) {
+// ── Monthly bar with target line ──
+function makeMonthlyBar(canvasId, data, target, unit = '%') {
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Actual',
+                    data,
+                    backgroundColor: data.map(v => v >= target
+                        ? 'rgba(0,212,170,0.75)'
+                        : 'rgba(255,68,68,0.75)'),
+                    borderRadius: 4,
+                    order: 2
+                },
+                {
+                    label: `Target (${target}${unit})`,
+                    data: Array(12).fill(target),
+                    type: 'line',
+                    borderColor: '#ffc800',
+                    borderDash: [5, 4],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    tension: 0,
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#8888aa', boxWidth: 10, font: { size: 10 } } },
+                tooltip: {
+                    callbacks: { label: c => ` ${c.parsed.y}${unit}` }
+                }
+            },
+            scales: {
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: {
+                    ticks: { color: '#8888aa', font: { size: 9 } },
+                    grid: { color: '#1e1e3a' },
+                    min: Math.min(...data, target) - 3,
+                    max: 100
+                }
+            }
+        }
+    });
+}
+
+// ── Bar chart (generic) ──
+function makeBar(canvasId, labels, data, target, label) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
     new Chart(ctx, {
@@ -682,29 +617,26 @@ function makeBar(canvasId, labels, data, target, color, label) {
                 label,
                 data,
                 backgroundColor: data.map(v => v <= target
-                    ? 'rgba(0,212,170,0.7)' : 'rgba(255,68,68,0.7)'),
-                borderRadius: 6
+                    ? 'rgba(0,212,170,0.7)'
+                    : 'rgba(255,68,68,0.7)'),
+                borderRadius: 5
             }]
         },
         options: {
             responsive: true,
             plugins: {
                 legend: { display: false },
-                tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}` } }
+                tooltip: { callbacks: { label: c => ` ${c.parsed.y}` } }
             },
             scales: {
-                x: { ticks: { color: '#8888aa' }, grid: { color: '#1e1e3a' } },
-                y: {
-                    ticks: { color: '#8888aa' },
-                    grid: { color: '#1e1e3a' },
-                    suggestedMax: target * 1.5
-                }
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
             }
         }
     });
 }
 
-// Line chart
+// ── Line chart ──
 function makeLine(canvasId, labels, datasets) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
@@ -713,16 +645,16 @@ function makeLine(canvasId, labels, datasets) {
         data: { labels, datasets },
         options: {
             responsive: true,
-            plugins: { legend: { labels: { color: '#8888aa', boxWidth: 12 } } },
+            plugins: { legend: { labels: { color: '#8888aa', boxWidth: 10, font: { size: 10 } } } },
             scales: {
-                x: { ticks: { color: '#8888aa' }, grid: { color: '#1e1e3a' } },
-                y: { ticks: { color: '#8888aa' }, grid: { color: '#1e1e3a' } }
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
             }
         }
     });
 }
 
-// Grouped bar (gear output)
+// ── Grouped bar (gear output) ──
 function makeGroupedBar(canvasId, labels, datasets) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return;
@@ -731,27 +663,26 @@ function makeGroupedBar(canvasId, labels, datasets) {
         data: { labels, datasets },
         options: {
             responsive: true,
-            plugins: { legend: { labels: { color: '#8888aa', boxWidth: 12 } } },
+            plugins: { legend: { labels: { color: '#8888aa', boxWidth: 10, font: { size: 10 } } } },
             scales: {
-                x: { ticks: { color: '#8888aa' }, grid: { color: '#1e1e3a' } },
-                y: { ticks: { color: '#8888aa' }, grid: { color: '#1e1e3a' } }
+                x: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } },
+                y: { ticks: { color: '#8888aa', font: { size: 9 } }, grid: { color: '#1e1e3a' } }
             }
         }
     });
 }
 
-// Progress bars (Aging WIP)
+// ── Progress bars (Aging WIP) ──
 function makeProgressBars(containerId, steps) {
     const el = document.getElementById(containerId);
     if (!el) return;
     el.innerHTML = steps.map(s => {
-        const pct   = Math.min((s.hrs / 10) * 100, 100);
-        const cls   = s.hrs < 4 ? 'fill-green' : s.hrs < 6 ? 'fill-yellow' : 'fill-red';
+        const pct = Math.min((s.hrs / 10) * 100, 100);
+        const cls = s.hrs < 4 ? 'fill-green' : s.hrs < 6 ? 'fill-yellow' : 'fill-red';
         return `
         <div class="progress-item">
             <div class="progress-header">
-                <span>${s.step}</span>
-                <span>${s.hrs} hrs</span>
+                <span>${s.step}</span><span>${s.hrs}h</span>
             </div>
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill ${cls}" style="width:${pct}%"></div>
@@ -760,72 +691,72 @@ function makeProgressBars(containerId, steps) {
     }).join('');
 }
 
-// Secondary KPI table
+// ── Secondary table ──
 function makeSecondaryTable(tbodyId, rows) {
     const el = document.getElementById(tbodyId);
     if (!el) return;
-    const statuses = ['🟢 On Track', '🟡 Monitor', '🔴 At Risk', '⚫ No Data'];
+    const statuses = ['🟢 On Track','🟡 Monitor','🔴 At Risk','⚫ No Data'];
     el.innerHTML = rows.map(r => {
         const st = statuses[Math.floor(Math.random() * statuses.length)];
-        return `<tr>
-            <td>${r.name}</td>
-            <td>${r.cat}</td>
-            <td>${st}</td>
-        </tr>`;
+        return `<tr><td>${r.name}</td><td>${r.cat}</td><td>${st}</td></tr>`;
     }).join('');
 }
 
 // ══════════════════════════════════════════
-//  SHARED MOCK DATA
+//  SHARED DATA
 // ══════════════════════════════════════════
 
-const days7  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const days7   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const months  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const secondaryKPIs = [
-    { name: 'GUND Kit On Time Delivery',        cat: 'Delivery' },
-    { name: 'GUND Kit Accuracy',                cat: 'Delivery' },
-    { name: 'Warehouse Stock Outs',             cat: 'Delivery' },
-    { name: 'Supermarket Stock Outs',           cat: 'Delivery' },
-    { name: 'Bossard Stock Outs',               cat: 'Delivery' },
-    { name: 'On-Time Releases',                 cat: 'Delivery' },
-    { name: 'On-Time LLPIR/PMR',                cat: 'Delivery' },
-    { name: 'On-Time Lock Release',             cat: 'Delivery' },
-    { name: 'Network Downtime',                 cat: 'Delivery' },
-    { name: 'Software Downtime',                cat: 'Delivery' },
-    { name: 'JIB Cranes Downtime',              cat: 'Delivery' },
-    { name: 'Workstation Downtime',             cat: 'Delivery' },
-    { name: 'Carts Kit Downtime',               cat: 'Delivery' },
-    { name: 'Devices — % Service On/Out',       cat: 'Delivery' },
-    { name: 'On-Time Sub Assembly Delivery',    cat: 'Delivery' },
-    { name: 'On-Time Delivery — Breakers',      cat: 'Delivery' },
-    { name: 'On-Time Delivery — Cradles',       cat: 'Delivery' },
-    { name: 'On-Time Delivery — Customer Parts',cat: 'Delivery' },
-    { name: 'Water Level Adherence',            cat: 'Delivery' },
-    { name: 'Kit Delivery Time',                cat: 'Delivery' },
-    { name: 'NCR Delivery Time',                cat: 'Delivery' },
-    { name: 'NCR Process Time',                 cat: 'Delivery' },
-    { name: 'Rework (as a process step)',        cat: 'Quality'  },
-    { name: 'Deviations',                       cat: 'Quality'  },
-    { name: 'Excess Material Waste',            cat: 'Cost'     },
-    { name: 'Excess Labor Costs',               cat: 'Cost'     },
-    { name: 'Overtime',                         cat: 'Cost'     },
-    { name: 'Scrap ACBD',                       cat: 'Cost'     },
-    { name: 'COGI',                             cat: 'Cost'     },
-    { name: 'Warranty ACAD',                    cat: 'Delivery' },
-    { name: 'Shipping Shorts',                  cat: 'Delivery' },
-    { name: 'System Processing Throughput',     cat: 'Delivery' },
-    { name: 'OEPR Impact',                      cat: 'Delivery' },
+    { name: 'GUND Kit On Time Delivery',          cat: 'Delivery' },
+    { name: 'GUND Kit Accuracy',                  cat: 'Delivery' },
+    { name: 'Warehouse Stock Outs',               cat: 'Delivery' },
+    { name: 'Supermarket Stock Outs',             cat: 'Delivery' },
+    { name: 'Bossard Stock Outs',                 cat: 'Delivery' },
+    { name: 'On-Time Releases',                   cat: 'Delivery' },
+    { name: 'On-Time LLPIR/PMR',                  cat: 'Delivery' },
+    { name: 'On-Time Lock Release',               cat: 'Delivery' },
+    { name: 'Network Downtime',                   cat: 'Delivery' },
+    { name: 'Software Downtime',                  cat: 'Delivery' },
+    { name: 'JIB Cranes Downtime',                cat: 'Delivery' },
+    { name: 'Workstation Downtime',               cat: 'Delivery' },
+    { name: 'Carts Kit Downtime',                 cat: 'Delivery' },
+    { name: 'Devices — % Service On/Out',         cat: 'Delivery' },
+    { name: 'On-Time Sub Assembly Delivery',      cat: 'Delivery' },
+    { name: 'On-Time Delivery — Breakers',        cat: 'Delivery' },
+    { name: 'On-Time Delivery — Cradles',         cat: 'Delivery' },
+    { name: 'On-Time Delivery — Customer Parts',  cat: 'Delivery' },
+    { name: 'Water Level Adherence',              cat: 'Delivery' },
+    { name: 'Kit Delivery Time',                  cat: 'Delivery' },
+    { name: 'NCR Delivery Time',                  cat: 'Delivery' },
+    { name: 'NCR Process Time',                   cat: 'Delivery' },
+    { name: 'Rework (as a process step)',          cat: 'Quality'  },
+    { name: 'Deviations',                         cat: 'Quality'  },
+    { name: 'Excess Material Waste',              cat: 'Cost'     },
+    { name: 'Excess Labor Costs',                 cat: 'Cost'     },
+    { name: 'Overtime',                           cat: 'Cost'     },
+    { name: 'Scrap ACBD',                         cat: 'Cost'     },
+    { name: 'COGI',                               cat: 'Cost'     },
+    { name: 'Warranty ACAD',                      cat: 'Delivery' },
+    { name: 'Shipping Shorts',                    cat: 'Delivery' },
+    { name: 'System Processing Throughput',       cat: 'Delivery' },
+    { name: 'OEPR Impact',                        cat: 'Delivery' },
 ];
 
 // ══════════════════════════════════════════
-//  BUILD ALL CHARTS ON LOAD
+//  BUILD ALL CHARTS
 // ══════════════════════════════════════════
 window.addEventListener('load', () => {
 
-    // ── SWBD ──
-    makeGauge('swbd-fpyGauge',  96.2, 98);
-    makeGauge('swbd-drGauge',   97.1, 95);
+    // ─────────── SWBD ───────────
+    makeMonthlyBar('swbd-fpyChart',
+        [96.1, 97.2, 95.8, 98.1, 97.5, 96.9, 98.3, 97.8, 96.2, 98.5, 97.1, 96.2], 98);
+
+    makeMonthlyBar('swbd-drChart',
+        [94.2, 96.1, 97.3, 95.8, 96.5, 97.8, 95.2, 96.9, 97.1, 95.4, 96.8, 97.1], 95);
+
     makeGauge('swbd-seqGauge',  93.4, 95);
     makeGauge('swbd-utilGauge', 88.3, 85);
 
@@ -837,62 +768,45 @@ window.addEventListener('load', () => {
         { step: 'Final Inspection', hrs: 2.9 },
     ]);
 
-    makeBar('swbd-agingSeqChart',
-        days7,
-        [1.8, 2.4, 1.2, 3.1, 1.9, 0.8, 2.2],
-        2,
-        '#00d4aa',
-        'Days'
-    );
+    makeBar('swbd-agingSeqChart', days7,
+        [1.8, 2.4, 1.2, 3.1, 1.9, 0.8, 2.2], 2, 'Days');
 
     makeGroupedBar('swbd-gearChart', days7, [
-        {
-            label: 'Shift 1',
-            data: [42, 38, 45, 40, 43, 35, 41],
-            backgroundColor: 'rgba(0,212,170,0.7)',
-            borderRadius: 4
-        },
-        {
-            label: 'Shift 2',
-            data: [39, 41, 37, 44, 38, 33, 40],
-            backgroundColor: 'rgba(0,122,180,0.7)',
-            borderRadius: 4
-        }
+        { label: 'Shift 1', data: [42,38,45,40,43,35,41],
+          backgroundColor: 'rgba(0,212,170,0.7)', borderRadius: 4 },
+        { label: 'Shift 2', data: [39,41,37,44,38,33,40],
+          backgroundColor: 'rgba(0,122,180,0.7)', borderRadius: 4 }
     ]);
 
     makeLine('swbd-yoyChart', months, [
         {
-            label: 'Productivity YOY %',
-            data: [3.2, 4.1, 5.5, 6.2, 5.8, 7.1, 6.4, 5.9, 6.8, 7.2, 6.1, 5.5],
+            label: 'YOY %',
+            data: [3.2,4.1,5.5,6.2,5.8,7.1,6.4,5.9,6.8,7.2,6.1,5.5],
             borderColor: '#00d4aa',
             backgroundColor: 'rgba(0,212,170,0.08)',
-            tension: 0.4,
-            fill: true,
-            pointRadius: 4
+            tension: 0.4, fill: true, pointRadius: 3
         },
         {
-            label: 'Target (5%)',
+            label: 'Target 5%',
             data: Array(12).fill(5),
             borderColor: '#ffc800',
-            borderDash: [6, 4],
-            pointRadius: 0,
-            tension: 0
+            borderDash: [5,4],
+            pointRadius: 0, tension: 0
         }
     ]);
 
-    makeBar('swbd-scansChart',
-        days7,
-        [5, 3, 7, 4, 6, 2, 7],
-        0,
-        '#ff4444',
-        'Associates'
-    );
+    makeBar('swbd-scansChart', days7,
+        [5,3,7,4,6,2,7], 0, 'Associates');
 
     makeSecondaryTable('swbd-secondary', secondaryKPIs);
 
-    // ── LVSG ──
-    makeGauge('lvsg-fpyGauge',  98.5, 98);
-    makeGauge('lvsg-drGauge',   95.8, 95);
+    // ─────────── LVSG ───────────
+    makeMonthlyBar('lvsg-fpyChart',
+        [97.8, 98.2, 98.5, 97.9, 99.1, 98.3, 98.7, 97.5, 98.9, 98.1, 99.0, 98.5], 98);
+
+    makeMonthlyBar('lvsg-drChart',
+        [95.1, 96.3, 94.8, 97.2, 95.9, 96.7, 95.4, 97.1, 96.2, 95.8, 96.5, 95.8], 95);
+
     makeGauge('lvsg-seqGauge',  96.2, 95);
     makeGauge('lvsg-utilGauge', 82.1, 85);
 
@@ -904,57 +818,45 @@ window.addEventListener('load', () => {
         { step: 'Final Inspection', hrs: 3.4 },
     ]);
 
-    makeBar('lvsg-agingSeqChart',
-        days7,
-        [1.2, 1.8, 2.1, 1.5, 2.8, 1.1, 1.9],
-        2, '#00d4aa', 'Days'
-    );
+    makeBar('lvsg-agingSeqChart', days7,
+        [1.2,1.8,2.1,1.5,2.8,1.1,1.9], 2, 'Days');
 
     makeGroupedBar('lvsg-gearChart', days7, [
-        {
-            label: 'Shift 1',
-            data: [28, 31, 27, 33, 29, 25, 30],
-            backgroundColor: 'rgba(0,212,170,0.7)',
-            borderRadius: 4
-        },
-        {
-            label: 'Shift 2',
-            data: [25, 28, 30, 27, 31, 22, 28],
-            backgroundColor: 'rgba(0,122,180,0.7)',
-            borderRadius: 4
-        }
+        { label: 'Shift 1', data: [28,31,27,33,29,25,30],
+          backgroundColor: 'rgba(0,212,170,0.7)', borderRadius: 4 },
+        { label: 'Shift 2', data: [25,28,30,27,31,22,28],
+          backgroundColor: 'rgba(0,122,180,0.7)', borderRadius: 4 }
     ]);
 
     makeLine('lvsg-yoyChart', months, [
         {
-            label: 'Productivity YOY %',
-            data: [4.1, 5.2, 6.1, 5.8, 6.4, 7.0, 5.5, 6.2, 7.1, 6.8, 5.9, 6.3],
+            label: 'YOY %',
+            data: [4.1,5.2,6.1,5.8,6.4,7.0,5.5,6.2,7.1,6.8,5.9,6.3],
             borderColor: '#00d4aa',
             backgroundColor: 'rgba(0,212,170,0.08)',
-            tension: 0.4,
-            fill: true,
-            pointRadius: 4
+            tension: 0.4, fill: true, pointRadius: 3
         },
         {
-            label: 'Target (5%)',
+            label: 'Target 5%',
             data: Array(12).fill(5),
             borderColor: '#ffc800',
-            borderDash: [6, 4],
-            pointRadius: 0
+            borderDash: [5,4],
+            pointRadius: 0, tension: 0
         }
     ]);
 
-    makeBar('lvsg-scansChart',
-        days7,
-        [3, 1, 4, 2, 5, 1, 4],
-        0, '#ff4444', 'Associates'
-    );
+    makeBar('lvsg-scansChart', days7,
+        [3,1,4,2,5,1,4], 0, 'Associates');
 
     makeSecondaryTable('lvsg-secondary', secondaryKPIs);
 
-    // ── PP ──
-    makeGauge('pp-fpyGauge',  97.0, 98);
-    makeGauge('pp-drGauge',   94.2, 95);
+    // ─────────── PP ───────────
+    makeMonthlyBar('pp-fpyChart',
+        [96.5, 97.1, 96.8, 97.4, 98.2, 97.9, 96.3, 97.6, 98.0, 97.2, 96.9, 97.0], 98);
+
+    makeMonthlyBar('pp-drChart',
+        [93.8, 94.5, 95.2, 94.1, 96.3, 95.7, 93.9, 95.4, 94.8, 95.1, 94.3, 94.2], 95);
+
     makeGauge('pp-seqGauge',  95.9, 95);
     makeGauge('pp-utilGauge', 86.7, 85);
 
@@ -966,51 +868,35 @@ window.addEventListener('load', () => {
         { step: 'Final Inspection', hrs: 2.2 },
     ]);
 
-    makeBar('pp-agingSeqChart',
-        days7,
-        [2.2, 1.5, 1.9, 2.7, 1.3, 2.1, 1.8],
-        2, '#00d4aa', 'Days'
-    );
+    makeBar('pp-agingSeqChart', days7,
+        [2.2,1.5,1.9,2.7,1.3,2.1,1.8], 2, 'Days');
 
     makeGroupedBar('pp-gearChart', days7, [
-        {
-            label: 'Shift 1',
-            data: [35, 32, 38, 36, 34, 30, 37],
-            backgroundColor: 'rgba(0,212,170,0.7)',
-            borderRadius: 4
-        },
-        {
-            label: 'Shift 2',
-            data: [31, 34, 33, 37, 30, 28, 35],
-            backgroundColor: 'rgba(0,122,180,0.7)',
-            borderRadius: 4
-        }
+        { label: 'Shift 1', data: [35,32,38,36,34,30,37],
+          backgroundColor: 'rgba(0,212,170,0.7)', borderRadius: 4 },
+        { label: 'Shift 2', data: [31,34,33,37,30,28,35],
+          backgroundColor: 'rgba(0,122,180,0.7)', borderRadius: 4 }
     ]);
 
     makeLine('pp-yoyChart', months, [
         {
-            label: 'Productivity YOY %',
-            data: [2.8, 3.5, 4.9, 5.3, 6.1, 5.7, 6.4, 5.2, 6.0, 6.5, 5.8, 6.2],
+            label: 'YOY %',
+            data: [2.8,3.5,4.9,5.3,6.1,5.7,6.4,5.2,6.0,6.5,5.8,6.2],
             borderColor: '#00d4aa',
             backgroundColor: 'rgba(0,212,170,0.08)',
-            tension: 0.4,
-            fill: true,
-            pointRadius: 4
+            tension: 0.4, fill: true, pointRadius: 3
         },
         {
-            label: 'Target (5%)',
+            label: 'Target 5%',
             data: Array(12).fill(5),
             borderColor: '#ffc800',
-            borderDash: [6, 4],
-            pointRadius: 0
+            borderDash: [5,4],
+            pointRadius: 0, tension: 0
         }
     ]);
 
-    makeBar('pp-scansChart',
-        days7,
-        [2, 0, 3, 1, 4, 0, 2],
-        0, '#ff4444', 'Associates'
-    );
+    makeBar('pp-scansChart', days7,
+        [2,0,3,1,4,0,2], 0, 'Associates');
 
     makeSecondaryTable('pp-secondary', secondaryKPIs);
 
