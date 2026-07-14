@@ -315,7 +315,14 @@
     <div class="main-grid">
         <div class="chart-card col-4" style="padding:0; overflow:hidden;">
             <table class="secondary-table">
-                <thead><tr><th>KPI</th><th>Category</th><th>Status</th></tr></thead>
+                <thead>
+    <tr>
+        <th>KPI</th>
+        <th style="text-align:center;">Value</th>
+        <th style="text-align:center;">Target</th>
+        <th style="text-align:center;">Status</th>
+    </tr>
+</thead>
                 <tbody id="swbd-secondary"></tbody>
             </table>
         </div>
@@ -408,7 +415,14 @@
     <div class="main-grid">
         <div class="chart-card col-4" style="padding:0; overflow:hidden;">
             <table class="secondary-table">
-                <thead><tr><th>KPI</th><th>Category</th><th>Status</th></tr></thead>
+                <thead>
+    <tr>
+        <th>KPI</th>
+        <th style="text-align:center;">Value</th>
+        <th style="text-align:center;">Target</th>
+        <th style="text-align:center;">Status</th>
+    </tr>
+</thead>
                 <tbody id="lvsg-secondary"></tbody>
             </table>
         </div>
@@ -501,7 +515,14 @@
     <div class="main-grid">
         <div class="chart-card col-4" style="padding:0; overflow:hidden;">
             <table class="secondary-table">
-                <thead><tr><th>KPI</th><th>Category</th><th>Status</th></tr></thead>
+                <thead>
+    <tr>
+        <th>KPI</th>
+        <th style="text-align:center;">Value</th>
+        <th style="text-align:center;">Target</th>
+        <th style="text-align:center;">Status</th>
+    </tr>
+</thead>
                 <tbody id="pp-secondary"></tbody>
             </table>
         </div>
@@ -695,10 +716,46 @@ function makeProgressBars(containerId, steps) {
 function makeSecondaryTable(tbodyId, rows) {
     const el = document.getElementById(tbodyId);
     if (!el) return;
-    const statuses = ['🟢 On Track','🟡 Monitor','🔴 At Risk','⚫ No Data'];
+
     el.innerHTML = rows.map(r => {
-        const st = statuses[Math.floor(Math.random() * statuses.length)];
-        return `<tr><td>${r.name}</td><td>${r.cat}</td><td>${st}</td></tr>`;
+        // Determine status based on value vs target
+        let status = '⚫ No Data';
+        let statusColor = '#555577';
+
+        if (r.value === 'TBD' || r.target === 'TBD') {
+            status = '⚫ No Data';
+            statusColor = '#555577';
+        } else {
+            // Extract numeric values for comparison
+            const rawVal    = parseFloat(r.value.replace(/[^0-9.-]/g, ''));
+            const rawTarget = parseFloat(r.target.replace(/[^0-9.-]/g, ''));
+            const isLower   = r.target.startsWith('<');
+            const isHigher  = r.target.startsWith('≥') || r.target.startsWith('>');
+
+            if (!isNaN(rawVal) && !isNaN(rawTarget)) {
+                if (isLower) {
+                    if (rawVal <= rawTarget)                        { status = '🟢 On Track';  statusColor = '#00d464'; }
+                    else if (rawVal <= rawTarget * 1.2)            { status = '🟡 Monitor';   statusColor = '#ffc800'; }
+                    else                                           { status = '🔴 At Risk';   statusColor = '#ff4444'; }
+                } else if (isHigher) {
+                    if (rawVal >= rawTarget)                        { status = '🟢 On Track';  statusColor = '#00d464'; }
+                    else if (rawVal >= rawTarget * 0.97)           { status = '🟡 Monitor';   statusColor = '#ffc800'; }
+                    else                                           { status = '🔴 At Risk';   statusColor = '#ff4444'; }
+                } else {
+                    // Exact target (e.g. target = 0)
+                    status = rawVal === rawTarget ? '🟢 On Track' : '🔴 At Risk';
+                    statusColor = rawVal === rawTarget ? '#00d464' : '#ff4444';
+                }
+            }
+        }
+
+        return `
+        <tr>
+            <td>${r.name}</td>
+            <td style="text-align:center; font-weight:600; color:#fff;">${r.value}</td>
+            <td style="text-align:center; color:#8888aa;">${r.target}</td>
+            <td style="text-align:center; color:${statusColor}; font-weight:600;">${status}</td>
+        </tr>`;
     }).join('');
 }
 
@@ -710,41 +767,43 @@ const days7   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const months  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const secondaryKPIs = [
-    { name: 'GUND Kit On Time Delivery',          cat: 'Delivery' },
-    { name: 'GUND Kit Accuracy',                  cat: 'Delivery' },
-    { name: 'Warehouse Stock Outs',               cat: 'Delivery' },
-    { name: 'Supermarket Stock Outs',             cat: 'Delivery' },
-    { name: 'Bossard Stock Outs',                 cat: 'Delivery' },
-    { name: 'On-Time Releases',                   cat: 'Delivery' },
-    { name: 'On-Time LLPIR/PMR',                  cat: 'Delivery' },
-    { name: 'On-Time Lock Release',               cat: 'Delivery' },
-    { name: 'Network Downtime',                   cat: 'Delivery' },
-    { name: 'Software Downtime',                  cat: 'Delivery' },
-    { name: 'JIB Cranes Downtime',                cat: 'Delivery' },
-    { name: 'Workstation Downtime',               cat: 'Delivery' },
-    { name: 'Carts Kit Downtime',                 cat: 'Delivery' },
-    { name: 'Devices — % Service On/Out',         cat: 'Delivery' },
-    { name: 'On-Time Sub Assembly Delivery',      cat: 'Delivery' },
-    { name: 'On-Time Delivery — Breakers',        cat: 'Delivery' },
-    { name: 'On-Time Delivery — Cradles',         cat: 'Delivery' },
-    { name: 'On-Time Delivery — Customer Parts',  cat: 'Delivery' },
-    { name: 'Water Level Adherence',              cat: 'Delivery' },
-    { name: 'Kit Delivery Time',                  cat: 'Delivery' },
-    { name: 'NCR Delivery Time',                  cat: 'Delivery' },
-    { name: 'NCR Process Time',                   cat: 'Delivery' },
-    { name: 'Rework (as a process step)',          cat: 'Quality'  },
-    { name: 'Deviations',                         cat: 'Quality'  },
-    { name: 'Excess Material Waste',              cat: 'Cost'     },
-    { name: 'Excess Labor Costs',                 cat: 'Cost'     },
-    { name: 'Overtime',                           cat: 'Cost'     },
-    { name: 'Scrap ACBD',                         cat: 'Cost'     },
-    { name: 'COGI',                               cat: 'Cost'     },
-    { name: 'Warranty ACAD',                      cat: 'Delivery' },
-    { name: 'Shipping Shorts',                    cat: 'Delivery' },
-    { name: 'System Processing Throughput',       cat: 'Delivery' },
-    { name: 'OEPR Impact',                        cat: 'Delivery' },
+    // Delivery
+    { name: 'GUND Kit On Time Delivery',          value: '91%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'GUND Kit Accuracy',                  value: '97%',    target: '≥ 98%',   cat: 'Delivery' },
+    { name: 'Warehouse Stock Outs',               value: '3',      target: '0',       cat: 'Delivery' },
+    { name: 'Supermarket Stock Outs',             value: '1',      target: '0',       cat: 'Delivery' },
+    { name: 'Bossard Stock Outs',                 value: '2',      target: '0',       cat: 'Delivery' },
+    { name: 'On-Time Releases',                   value: '93%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'On-Time LLPIR/PMR',                  value: '88%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'On-Time Lock Release',               value: '96%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'Network Downtime',                   value: '2.1 hrs',target: '< 1 hr',  cat: 'Delivery' },
+    { name: 'Software Downtime',                  value: '0.5 hrs',target: '< 1 hr',  cat: 'Delivery' },
+    { name: 'JIB Cranes Downtime',                value: '1.2 hrs',target: '< 1 hr',  cat: 'Delivery' },
+    { name: 'Workstation Downtime',               value: '0.8 hrs',target: '< 1 hr',  cat: 'Delivery' },
+    { name: 'Carts Kit Downtime',                 value: '0.3 hrs',target: '< 1 hr',  cat: 'Delivery' },
+    { name: 'Devices — % Service On/Out',         value: '94%',    target: '≥ 98%',   cat: 'Delivery' },
+    { name: 'On-Time Sub Assembly Delivery',      value: '96%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'On-Time Delivery — Breakers',        value: '92%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'On-Time Delivery — Cradles',         value: '97%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'On-Time Delivery — Customer Parts',  value: '89%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'Water Level Adherence',              value: '78%',    target: '≥ 90%',   cat: 'Delivery' },
+    { name: 'Kit Delivery Time',                  value: '4.2 hrs',target: '< 4 hrs', cat: 'Delivery' },
+    { name: 'NCR Delivery Time',                  value: '3.1 days',target: '< 2 days',cat: 'Delivery'},
+    { name: 'NCR Process Time',                   value: '5.4 days',target: '< 3 days',cat: 'Delivery'},
+    // Quality
+    { name: 'Rework (as a process step)',          value: '4.2%',   target: '< 2%',    cat: 'Quality'  },
+    { name: 'Deviations',                         value: '7',      target: '< 5',     cat: 'Quality'  },
+    // Cost
+    { name: 'Excess Material Waste',              value: '$4,200', target: '< $3,000',cat: 'Cost'     },
+    { name: 'Excess Labor Costs',                 value: '$8,100', target: '< $6,000',cat: 'Cost'     },
+    { name: 'Overtime',                           value: '12%',    target: '< 8%',    cat: 'Cost'     },
+    { name: 'Scrap ACBD',                         value: '$1,800', target: '< $1,500',cat: 'Cost'     },
+    { name: 'COGI',                               value: '5',      target: '0',       cat: 'Cost'     },
+    { name: 'Warranty ACAD',                      value: '2',      target: '0',       cat: 'Delivery' },
+    { name: 'Shipping Shorts',                    value: '3',      target: '0',       cat: 'Delivery' },
+    { name: 'System Processing Throughput',       value: '87%',    target: '≥ 95%',   cat: 'Delivery' },
+    { name: 'OEPR Impact',                        value: 'TBD',    target: 'TBD',     cat: 'Delivery' },
 ];
-
 // ══════════════════════════════════════════
 //  BUILD ALL CHARTS
 // ══════════════════════════════════════════
