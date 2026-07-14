@@ -204,13 +204,13 @@
 
     /* ── Department Grid ── */
     .dept-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.25rem;
-      padding: 0 2rem 3rem;
-      max-width: 1400px;
-      margin: 0 auto;
-    }
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 24px;
+}
 
     /* ── Department Card ── */
     .dept-card {
@@ -433,308 +433,208 @@
 
   <div class="dept-grid">
 
-    <!-- Engineering -->
-    <a class="dept-card" href="engineering.html"
-       style="--card-accent:#45B7D1; --icon-bg:rgba(69,183,209,0.12);">
-      <div class="card-header">
-        <div class="card-icon">⚙️</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Engineering</div>
-      <div class="card-subtitle">Design, OEPR, Delivery Reliability</div>
-      <div class="badge-row">
-        <span class="badge badge-D">Delivery</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">4</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">4</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">8</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:1;"></div>
-        <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
-      </div>
-    </a>
+  <!-- ROW 1 -->
 
-    <!-- Fabrication -->
-    <a class="dept-card" href="fabrication.html"
-       style="--card-accent:#FF6B6B; --icon-bg:rgba(255,107,107,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🔧</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Fabrication</div>
-      <div class="card-subtitle">OEE, Productivity, Cycle Time, Quality</div>
-      <div class="badge-row">
-        <span class="badge badge-Q">Quality</span>
-        <span class="badge badge-D">Delivery</span>
-        <span class="badge badge-C">Cost</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">8</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">18</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">26</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:2;"></div>
-        <div class="status-mini-seg" style="background:#FF4757; flex:1;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
-      </div>
-    </a>
-
-    <!-- Logistics - Materials -->
-    <a class="dept-card" href="logistics-materials.html"
-       style="--card-accent:#96CEB4; --icon-bg:rgba(150,206,180,0.12);">
-      <div class="card-header">
-        <div class="card-icon">📦</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Logistics — Materials</div>
-      <div class="card-subtitle">Inventory Accuracy, Aging, Raw Material</div>
-      <div class="badge-row">
-        <span class="badge badge-C">Cost</span>
-        <span class="badge badge-D">Delivery</span>
-        <span class="badge badge-Q">Quality</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">1</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">8</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">9</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:1;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:4;"></div>
-      </div>
-    </a>
-
-    <!-- Logistics - Supermarket -->
-    <a class="dept-card" href="logistics-supermarket.html"
-       style="--card-accent:#FFEAA7; --icon-bg:rgba(255,234,167,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🛒</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Logistics — Supermarket</div>
-      <div class="card-subtitle">Kit Accuracy, Water Level, Aging</div>
-      <div class="badge-row">
-        <span class="badge badge-D">Delivery</span>
-        <span class="badge badge-C">Cost</span>
-        <span class="badge badge-S">Safety</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">3</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">12</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">15</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
-      </div>
-    </a>
-
-    <!-- Logistics - Warehouse -->
-    <a class="dept-card" href="logistics-warehouse.html"
-       style="--card-accent:#A29BFE; --icon-bg:rgba(162,155,254,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🏗️</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Logistics — Warehouse</div>
-      <div class="card-subtitle">RTS, Kit Accuracy, Water Level, Aging</div>
-      <div class="badge-row">
-        <span class="badge badge-D">Delivery</span>
-        <span class="badge badge-C">Cost</span>
-        <span class="badge badge-Q">Quality</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">4</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">11</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">15</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
-      </div>
-    </a>
-
-    <!-- Logistics - Shipping -->
-    <a class="dept-card" href="logistics-shipping.html"
-       style="--card-accent:#74B9FF; --icon-bg:rgba(116,185,255,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🚚</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Logistics — Shipping</div>
-      <div class="card-subtitle">Storage Aging, Shipped Quantity, SAP</div>
-      <div class="badge-row">
-        <span class="badge badge-D">Delivery</span>
-        <span class="badge badge-C">Cost</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">2</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">11</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">13</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:5;"></div>
-      </div>
-    </a>
-
-    <!-- Purchasing -->
-    <a class="dept-card" href="purchasing.html"
-       style="--card-accent:#FDCB6E; --icon-bg:rgba(253,203,110,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🛍️</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Purchasing</div>
-      <div class="card-subtitle">Aging POs, Vendor Tracking, Requisitions</div>
-      <div class="badge-row">
-        <span class="badge badge-D">Delivery</span>
-        <span class="badge badge-C">Cost</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">4</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">7</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">11</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:2;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
-      </div>
-    </a>
-
-    <!-- Safety / EHS -->
-    <a class="dept-card" href="safety.html"
-       style="--card-accent:#FF7675; --icon-bg:rgba(255,118,117,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🦺</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Safety — EHS</div>
-      <div class="card-subtitle">Recordables, LTIR, 6S, Near Misses</div>
-      <div class="badge-row">
-        <span class="badge badge-S">Safety</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">7</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">5</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">12</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:3;"></div>
-        <div class="status-mini-seg" style="background:#FFB800; flex:1;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
-      </div>
-    </a>
-
-   <!-- Production -->
-<a class="dept-card" href="production.html"
-   style="--card-accent:#00D4AA; --icon-bg:rgba(0,212,170,0.12);">
-  <div class="card-header">
-    <div class="card-icon">🏭</div>
-    <div class="card-arrow">→</div>
-  </div>
-  <div class="card-title">Production</div>
-  <div class="card-subtitle">SWBD · LVSG · PP — Output, Yield, Delivery, Utilization</div>
-  <div class="badge-row">
-    <span class="badge badge-Q">Quality</span>
-    <span class="badge badge-D">Delivery</span>
-    <span class="badge badge-C">Cost</span>
-  </div>
-  <div class="kpi-counts">
-    <div class="kpi-count-item">
-      <div class="kpi-count-num primary">11</div>
-      <div class="kpi-count-label">Primary</div>
+  <!-- Production -->
+  <a class="dept-card" href="production.html"
+     style="--card-accent:#00D4AA; --icon-bg:rgba(0,212,170,0.12);">
+    <div class="card-header">
+      <div class="card-icon">🏭</div>
+      <div class="card-arrow">→</div>
     </div>
-    <div class="kpi-count-item">
-      <div class="kpi-count-num secondary">23</div>
-      <div class="kpi-count-label">Secondary</div>
+    <div class="card-title">Production</div>
+    <div class="card-subtitle">SWBD · LVSG · PP — Output, Yield, Delivery, Utilization</div>
+    <div class="badge-row">
+      <span class="badge badge-Q">Quality</span>
+      <span class="badge badge-D">Delivery</span>
+      <span class="badge badge-C">Cost</span>
     </div>
-    <div class="kpi-count-item">
-      <div class="kpi-count-num">34</div>
-      <div class="kpi-count-label">Total KPIs</div>
+    <div class="kpi-counts">
+      <div class="kpi-count-item">
+        <div class="kpi-count-num primary">11</div>
+        <div class="kpi-count-label">Primary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num secondary">23</div>
+        <div class="kpi-count-label">Secondary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num">34</div>
+        <div class="kpi-count-label">Total KPIs</div>
+      </div>
     </div>
-  </div>
-  <div class="status-mini">
-    <div class="status-mini-seg" style="background:#00C48C; flex:5;"></div>
-    <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
-    <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
-  </div>
-</a>
+    <div class="status-mini">
+      <div class="status-mini-seg" style="background:#00C48C; flex:5;"></div>
+      <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
+      <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
+    </div>
+  </a>
 
-  </div><!-- /dept-grid -->
+  <!-- Logistics -->
+  <a class="dept-card" href="logistics.html"
+     style="--card-accent:#74B9FF; --icon-bg:rgba(116,185,255,0.12);">
+    <div class="card-header">
+      <div class="card-icon">📦</div>
+      <div class="card-arrow">→</div>
+    </div>
+    <div class="card-title">Logistics</div>
+    <div class="card-subtitle">Materials · Supermarket · Warehouse · Shipping</div>
+    <div class="badge-row">
+      <span class="badge badge-D">Delivery</span>
+      <span class="badge badge-C">Cost</span>
+      <span class="badge badge-Q">Quality</span>
+    </div>
+    <div class="kpi-counts">
+      <div class="kpi-count-item">
+        <div class="kpi-count-num primary">11</div>
+        <div class="kpi-count-label">Primary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num secondary">47</div>
+        <div class="kpi-count-label">Secondary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num">58</div>
+        <div class="kpi-count-label">Total KPIs</div>
+      </div>
+    </div>
+    <div class="status-mini">
+      <div class="status-mini-seg" style="background:#00C48C; flex:4;"></div>
+      <div class="status-mini-seg" style="background:#FFB800; flex:3;"></div>
+      <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
+    </div>
+  </a>
+
+  <!-- Safety -->
+  <a class="dept-card" href="safety.html"
+     style="--card-accent:#FF7675; --icon-bg:rgba(255,118,117,0.12);">
+    <div class="card-header">
+      <div class="card-icon">🦺</div>
+      <div class="card-arrow">→</div>
+    </div>
+    <div class="card-title">Safety — EHS</div>
+    <div class="card-subtitle">Recordables, LTIR, 6S, Near Misses</div>
+    <div class="badge-row">
+      <span class="badge badge-S">Safety</span>
+    </div>
+    <div class="kpi-counts">
+      <div class="kpi-count-item">
+        <div class="kpi-count-num primary">7</div>
+        <div class="kpi-count-label">Primary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num secondary">5</div>
+        <div class="kpi-count-label">Secondary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num">12</div>
+        <div class="kpi-count-label">Total KPIs</div>
+      </div>
+    </div>
+    <div class="status-mini">
+      <div class="status-mini-seg" style="background:#00C48C; flex:3;"></div>
+      <div class="status-mini-seg" style="background:#FFB800; flex:1;"></div>
+      <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+    </div>
+  </a>
+
+  <!-- ROW 2 -->
+
+  <!-- Engineering (placeholder) -->
+  <a class="dept-card" href="#"
+     style="--card-accent:#A29BFE; --icon-bg:rgba(162,155,254,0.12);">
+    <div class="card-header">
+      <div class="card-icon">⚙️</div>
+      <div class="card-arrow">→</div>
+    </div>
+    <div class="card-title">Engineering</div>
+    <div class="card-subtitle">Coming Soon</div>
+    <div class="badge-row">
+      <span class="badge badge-Q">Quality</span>
+      <span class="badge badge-D">Delivery</span>
+    </div>
+    <div class="kpi-counts">
+      <div class="kpi-count-item">
+        <div class="kpi-count-num primary">—</div>
+        <div class="kpi-count-label">Primary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num secondary">—</div>
+        <div class="kpi-count-label">Secondary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num">—</div>
+        <div class="kpi-count-label">Total KPIs</div>
+      </div>
+    </div>
+    <div class="status-mini">
+      <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+    </div>
+  </a>
+
+  <!-- Quality (placeholder) -->
+  <a class="dept-card" href="#"
+     style="--card-accent:#FDCB6E; --icon-bg:rgba(253,203,110,0.12);">
+    <div class="card-header">
+      <div class="card-icon">🔬</div>
+      <div class="card-arrow">→</div>
+    </div>
+    <div class="card-title">Quality</div>
+    <div class="card-subtitle">Coming Soon</div>
+    <div class="badge-row">
+      <span class="badge badge-Q">Quality</span>
+    </div>
+    <div class="kpi-counts">
+      <div class="kpi-count-item">
+        <div class="kpi-count-num primary">—</div>
+        <div class="kpi-count-label">Primary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num secondary">—</div>
+        <div class="kpi-count-label">Secondary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num">—</div>
+        <div class="kpi-count-label">Total KPIs</div>
+      </div>
+    </div>
+    <div class="status-mini">
+      <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+    </div>
+  </a>
+
+  <!-- Finance (placeholder) -->
+  <a class="dept-card" href="#"
+     style="--card-accent:#55EFC4; --icon-bg:rgba(85,239,196,0.12);">
+    <div class="card-header">
+      <div class="card-icon">💰</div>
+      <div class="card-arrow">→</div>
+    </div>
+    <div class="card-title">Finance</div>
+    <div class="card-subtitle">Coming Soon</div>
+    <div class="badge-row">
+      <span class="badge badge-C">Cost</span>
+    </div>
+    <div class="kpi-counts">
+      <div class="kpi-count-item">
+        <div class="kpi-count-num primary">—</div>
+        <div class="kpi-count-label">Primary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num secondary">—</div>
+        <div class="kpi-count-label">Secondary</div>
+      </div>
+      <div class="kpi-count-item">
+        <div class="kpi-count-num">—</div>
+        <div class="kpi-count-label">Total KPIs</div>
+      </div>
+    </div>
+    <div class="status-mini">
+      <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+    </div>
+  </a>
+
+</div>
 
   <!-- ══════════ FOOTER ══════════ -->
   <footer>
