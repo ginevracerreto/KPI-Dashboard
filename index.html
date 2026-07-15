@@ -1,587 +1,393 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Plant KPI Dashboard</title>
+  <title>Siemens Operations Dashboard</title>
   <style>
-    /* ── Reset & Base ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --siemens-teal:   #00D7A0;
-      --siemens-dark:   #009999;
-      --bg-dark:        #0D1B2A;
-      --bg-card:        #132337;
-      --bg-card-hover:  #1A2F47;
-      --text-primary:   #E8F4FD;
-      --text-secondary: #8BAFC7;
-      --border:         #1E3A52;
-      --green:          #00C48C;
-      --yellow:         #FFB800;
-      --red:            #FF4757;
-      --gray:           #5A7A8A;
-      --badge-ehs:      #FF6B6B;
-      --badge-quality:  #4ECDC4;
-      --badge-delivery: #45B7D1;
-      --badge-cost:     #96CEB4;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-primary);
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a1a;
+      color: #e0e0e0;
       min-height: 100vh;
     }
 
-    /* ── Header ── */
+    /* ══════════════════════════════
+       HEADER
+    ══════════════════════════════ */
     header {
-      background: linear-gradient(135deg, #0A1628 0%, #132337 50%, #0D1B2A 100%);
-      border-bottom: 2px solid var(--siemens-teal);
-      padding: 0 2rem;
+      background: linear-gradient(135deg, #00d4aa 0%, #007a6e 100%);
+      padding: 16px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      height: 72px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 4px 24px rgba(0,215,160,0.1);
+      box-shadow: 0 2px 16px rgba(0,212,170,0.3);
+    }
+    .header-left h1 { font-size: 1.4rem; font-weight: 700; color: #fff; letter-spacing: 1px; }
+    .header-left p  { font-size: 0.78rem; color: rgba(255,255,255,0.75); margin-top: 2px; }
+    .header-right   { font-size: 0.78rem; color: rgba(255,255,255,0.75); text-align: right; }
+
+    /* ══════════════════════════════
+       PAGE WRAPPER
+    ══════════════════════════════ */
+    .page-wrapper {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
     }
 
-    .header-left {
+    /* ══════════════════════════════
+       SECTION TITLE
+    ══════════════════════════════ */
+    .section-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #00d4aa;
+      border-left: 3px solid #00d4aa;
+      padding-left: 10px;
+      margin-bottom: 16px;
+    }
+
+    /* ══════════════════════════════
+       KPI PANEL — outer shell
+    ══════════════════════════════ */
+    .kpi-panel {
+      background: #12122a;
+      border: 1px solid #1e1e3a;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+
+    /* ── top bar: dept tabs + filter ── */
+    .kpi-panel-top {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      background: #0e0e24;
+      border-bottom: 1px solid #1e1e3a;
+      padding: 0 20px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* dept tabs */
+    .dept-tabs {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 10px 0;
+    }
+    .dept-tab {
+      padding: 6px 16px;
+      border-radius: 20px;
+      border: 1.5px solid #2a2a4a;
+      background: transparent;
+      color: #8888aa;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .dept-tab:hover { border-color: #00d4aa; color: #00d4aa; }
+    .dept-tab.active { background: #00d4aa; border-color: #00d4aa; color: #0a0a1a; }
+
+    /* filter group */
+    .filter-group {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 6px;
+      padding: 10px 0;
+      flex-wrap: wrap;
+    }
+    .filter-label {
+      font-size: 0.68rem;
+      color: #555577;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .filter-btn {
+      padding: 5px 13px;
+      border-radius: 16px;
+      border: 1.5px solid #2a2a4a;
+      background: transparent;
+      color: #8888aa;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .filter-btn:hover  { border-color: #ffc800; color: #ffc800; }
+    .filter-btn.active { background: #ffc800; border-color: #ffc800; color: #0a0a1a; }
+
+    /* ── table area ── */
+    .kpi-table-wrap {
+      min-height: 220px;
+      position: relative;
     }
 
-    .siemens-logo {
+    /* empty state */
+    .kpi-empty {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .logo-mark {
-      width: 36px;
-      height: 36px;
-      background: var(--siemens-teal);
-      border-radius: 6px;
-      display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-weight: 900;
-      font-size: 1.1rem;
-      color: #0D1B2A;
-      letter-spacing: -1px;
+      min-height: 220px;
+      gap: 10px;
+      color: #333355;
     }
+    .kpi-empty .empty-icon { font-size: 2.2rem; }
+    .kpi-empty .empty-text { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px; }
+    .kpi-empty .empty-sub  { font-size: 0.7rem; color: #2a2a4a; }
 
-    .logo-text {
-      font-size: 1.1rem;
+    /* KPI table */
+    .kpi-main-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .kpi-main-table thead tr {
+      background: #1a1a35;
+    }
+    .kpi-main-table th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 0.68rem;
       font-weight: 700;
-      color: var(--text-primary);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .th-kpi      { color: #aaaacc; }
+    .th-ehs      { color: #ff7675; }
+    .th-quality  { color: #74b9ff; }
+    .th-delivery { color: #00d4aa; }
+    .th-cost     { color: #fdcb6e; }
+    .th-refresh  { color: #a29bfe; }
+    .th-target   { color: #55efc4; }
+    .th-status   { color: #aaaacc; }
+
+    .kpi-main-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #1a1a35;
+      color: #cccce0;
+      vertical-align: middle;
+    }
+    .kpi-main-table tr:last-child td { border-bottom: none; }
+    .kpi-main-table tr:hover td { background: #14143a; }
+
+    /* category pill */
+    .cat-pill {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 10px;
+      font-size: 0.65rem;
+      font-weight: 700;
       letter-spacing: 0.5px;
     }
+    .pill-S { background: rgba(255,118,117,0.15); color: #ff7675; }
+    .pill-Q { background: rgba(116,185,255,0.15); color: #74b9ff; }
+    .pill-D { background: rgba(0,212,170,0.15);   color: #00d4aa; }
+    .pill-C { background: rgba(253,203,110,0.15); color: #fdcb6e; }
 
-    .header-divider {
-      width: 1px;
-      height: 32px;
-      background: var(--border);
-    }
-
-    .header-title {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      font-weight: 400;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .live-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: rgba(0,196,140,0.1);
-      border: 1px solid rgba(0,196,140,0.3);
-      border-radius: 20px;
-      padding: 0.3rem 0.8rem;
-      font-size: 0.75rem;
-      color: var(--green);
-      font-weight: 600;
-    }
-
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(1.3); }
-    }
-
-    /* ── Hero Section ── */
-    .hero {
-      padding: 3rem 2rem 1.5rem;
-      text-align: center;
-    }
-
-    .hero-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--siemens-teal);
-      margin-bottom: 0.75rem;
-    }
-
-    .hero h1 {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 0.75rem;
-      background: linear-gradient(135deg, #E8F4FD 0%, var(--siemens-teal) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      max-width: 560px;
-      margin: 0 auto 2rem;
-      line-height: 1.6;
-    }
-
-    /* ── Summary Bar ── */
-    .summary-bar {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      padding: 0 2rem 2.5rem;
-    }
-
-    .summary-chip {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+    /* refresh badge */
+    .refresh-badge {
+      display: inline-block;
+      padding: 2px 9px;
       border-radius: 10px;
-      padding: 0.6rem 1.2rem;
-      font-size: 0.85rem;
-    }
-
-    .summary-chip .chip-num {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--siemens-teal);
-    }
-
-    .summary-chip .chip-label {
-      color: var(--text-secondary);
-    }
-
-    /* ── Section Label ── */
-    .section-label {
-      padding: 0 2rem 1rem;
-      font-size: 0.75rem;
+      font-size: 0.65rem;
       font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-secondary);
-      border-bottom: 1px solid var(--border);
-      margin: 0 2rem 1.5rem;
+      background: rgba(162,155,254,0.12);
+      color: #a29bfe;
     }
 
-    /* ── Department Grid ── */
+    /* status dot */
+    .status-dot-cell { display: flex; align-items: center; gap: 6px; }
+    .sdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sdot-green  { background: #00d464; }
+    .sdot-yellow { background: #ffc800; }
+    .sdot-red    { background: #ff4444; }
+    .sdot-grey   { background: #555577; }
+
+    /* ══════════════════════════════
+       DEPT CARDS SECTION
+    ══════════════════════════════ */
     .dept-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 28px 24px;
-}
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 8px;
+    }
 
-    /* ── Department Card ── */
     .dept-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
+      background: #12122a;
+      border: 1px solid #1e1e3a;
       border-radius: 16px;
-      padding: 1.5rem;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      position: relative;
-      overflow: hidden;
+      padding: 20px;
       text-decoration: none;
-      display: block;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      border-top: 3px solid var(--card-accent, #00d4aa);
+      cursor: pointer;
     }
-
-    .dept-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--card-accent, var(--siemens-teal));
-      border-radius: 16px 16px 0 0;
-    }
-
-    .dept-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at top left, rgba(0,215,160,0.04) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
     .dept-card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--siemens-teal);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0,215,160,0.12);
-    }
-
-    .dept-card:hover .card-arrow {
-      transform: translateX(4px);
-      color: var(--siemens-teal);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+      border-color: var(--card-accent, #00d4aa);
     }
 
     .card-header {
       display: flex;
-      align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 1rem;
+      align-items: flex-start;
     }
+    .card-icon  { font-size: 1.8rem; background: var(--icon-bg, rgba(0,212,170,0.1)); border-radius: 10px; padding: 8px 10px; }
+    .card-arrow { font-size: 1.1rem; color: #333355; transition: color 0.2s; }
+    .dept-card:hover .card-arrow { color: var(--card-accent, #00d4aa); }
 
-    .card-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: var(--icon-bg, rgba(0,215,160,0.1));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-    }
+    .card-title    { font-size: 1rem; font-weight: 700; color: #fff; }
+    .card-subtitle { font-size: 0.72rem; color: #8888aa; line-height: 1.4; }
 
-    .card-arrow {
-      color: var(--text-secondary);
-      font-size: 1.2rem;
-      transition: all 0.2s ease;
-      margin-top: 4px;
-    }
-
-    .card-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-    }
-
-    .card-subtitle {
-      font-size: 0.78rem;
-      color: var(--text-secondary);
-      margin-bottom: 1rem;
-    }
-
-    /* ── KPI Type Badges ── */
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-bottom: 1.2rem;
-    }
-
+    .badge-row { display: flex; gap: 6px; flex-wrap: wrap; }
     .badge {
-      font-size: 0.68rem;
+      font-size: 0.62rem;
       font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 8px;
       letter-spacing: 0.5px;
-      padding: 0.2rem 0.55rem;
-      border-radius: 6px;
-      text-transform: uppercase;
     }
+    .badge-S { background: rgba(255,118,117,0.15); color: #ff7675; }
+    .badge-Q { background: rgba(116,185,255,0.15); color: #74b9ff; }
+    .badge-D { background: rgba(0,212,170,0.15);   color: #00d4aa; }
+    .badge-C { background: rgba(253,203,110,0.15); color: #fdcb6e; }
 
-    .badge-S { background: rgba(255,107,107,0.15); color: #FF6B6B; border: 1px solid rgba(255,107,107,0.3); }
-    .badge-Q { background: rgba(78,205,196,0.15);  color: #4ECDC4; border: 1px solid rgba(78,205,196,0.3); }
-    .badge-D { background: rgba(69,183,209,0.15);  color: #45B7D1; border: 1px solid rgba(69,183,209,0.3); }
-    .badge-C { background: rgba(150,206,180,0.15); color: #96CEB4; border: 1px solid rgba(150,206,180,0.3); }
+    .kpi-counts { display: flex; gap: 0; border-top: 1px solid #1e1e3a; padding-top: 10px; }
+    .kpi-count-item { flex: 1; text-align: center; }
+    .kpi-count-item + .kpi-count-item { border-left: 1px solid #1e1e3a; }
+    .kpi-count-num   { font-size: 1.3rem; font-weight: 700; color: #fff; }
+    .kpi-count-num.primary   { color: #00d4aa; }
+    .kpi-count-num.secondary { color: #8888aa; }
+    .kpi-count-label { font-size: 0.6rem; color: #555577; margin-top: 2px; }
 
-    /* ── KPI Count Row ── */
-    .kpi-counts {
-      display: flex;
-      gap: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .kpi-count-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-
-    .kpi-count-num {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1;
-    }
-
-    .kpi-count-num.primary   { color: var(--siemens-teal); }
-    .kpi-count-num.secondary { color: var(--yellow); }
-
-    .kpi-count-label {
-      font-size: 0.65rem;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 0.2rem;
-    }
-
-    /* ── Status Mini Bar ── */
-    .status-mini {
-      display: flex;
-      gap: 3px;
-      margin-top: 0.8rem;
-    }
-
-    .status-mini-seg {
-      height: 4px;
-      border-radius: 2px;
-      flex: 1;
-    }
+    .status-mini { display: flex; height: 4px; border-radius: 2px; overflow: hidden; gap: 2px; margin-top: 4px; }
+    .status-mini-seg { border-radius: 2px; }
 
     /* ── Footer ── */
-    footer {
+    .page-footer {
       text-align: center;
-      padding: 1.5rem;
-      color: var(--text-secondary);
-      font-size: 0.75rem;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      .dept-grid { grid-template-columns: 1fr; padding: 0 1rem 2rem; }
-      .hero { padding: 2rem 1rem 1rem; }
-      .summary-bar { padding: 0 1rem 2rem; }
-      .section-label { margin: 0 1rem 1rem; }
-      header { padding: 0 1rem; }
-      .header-title { display: none; }
+      color: #222244;
+      font-size: 0.68rem;
+      padding: 20px;
     }
   </style>
 </head>
 <body>
 
-  <!-- ══════════ HEADER ══════════ -->
-  <header>
-    <div class="header-left">
-      <div class="siemens-logo">
-        <div class="logo-mark">SI</div>
-        <span class="logo-text">Siemens</span>
-      </div>
-      <div class="header-divider"></div>
-      <span class="header-title">Manufacturing Operations Center</span>
-    </div>
-    <div class="header-right">
-      <div class="live-badge">
-        <div class="live-dot"></div>
-        Live Dashboard
-      </div>
-    </div>
-  </header>
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="header-left">
+    <h1>⚡ Siemens Operations Hub</h1>
+    <p>Internal KPI Dashboard · Grand Prairie Facility</p>
+  </div>
+  <div class="header-right">
+    Live Dashboard<br/>Mock Data Mode
+  </div>
+</header>
 
-  <!-- ══════════ HERO ══════════ -->
-  <section class="hero">
-    <div class="hero-eyebrow">🏭 North Star KPI Command Center</div>
-    <h1>Production Plant<br/>Performance Dashboard</h1>
-    <p>Select a department below to explore its key performance indicators, track targets, and identify areas that need attention.</p>
-  </section>
+<div class="page-wrapper">
 
-  <!-- ══════════ SUMMARY BAR ══════════ -->
-  <div class="summary-bar">
-    <div class="summary-chip">
-      <span class="chip-num">11</span>
-      <span class="chip-label">Departments</span>
+  <!-- ══════════════════════════════════════
+       KPI OVERVIEW TABLE
+  ══════════════════════════════════════ -->
+  <div class="section-title">Primary KPI Overview</div>
+
+  <div class="kpi-panel">
+
+    <!-- top bar -->
+    <div class="kpi-panel-top">
+
+      <!-- Department Tabs -->
+      <div class="dept-tabs">
+        <button class="dept-tab active" onclick="selectDept('EHS',         this)">EHS</button>
+        <button class="dept-tab"        onclick="selectDept('Quality',     this)">Quality</button>
+        <button class="dept-tab"        onclick="selectDept('Logistics',   this)">Logistics</button>
+        <button class="dept-tab"        onclick="selectDept('Fabrication', this)">Fabrication</button>
+        <button class="dept-tab"        onclick="selectDept('LVSG',        this)">LVSG</button>
+        <button class="dept-tab"        onclick="selectDept('PBSB',        this)">PBSB</button>
+        <button class="dept-tab"        onclick="selectDept('Purchasing',  this)">Purchasing</button>
+        <button class="dept-tab"        onclick="selectDept('Engineering', this)">Engineering</button>
+      </div>
+
+      <!-- Refresh Filter -->
+      <div class="filter-group">
+        <span class="filter-label">Refresh:</span>
+        <button class="filter-btn" onclick="selectFilter('Real Time', this)">Real Time</button>
+        <button class="filter-btn" onclick="selectFilter('Daily',     this)">Daily</button>
+        <button class="filter-btn" onclick="selectFilter('Weekly',    this)">Weekly</button>
+        <button class="filter-btn" onclick="selectFilter('Monthly',   this)">Monthly</button>
+        <button class="filter-btn" onclick="selectFilter('Quarterly', this)">Quarterly</button>
+      </div>
+
     </div>
-    <div class="summary-chip">
-      <span class="chip-num">40+</span>
-      <span class="chip-label">Primary KPIs</span>
-    </div>
-    <div class="summary-chip">
-      <span class="chip-num">100+</span>
-      <span class="chip-label">Total KPIs</span>
-    </div>
-    <div class="summary-chip">
-      <span class="chip-num">6</span>
-      <span class="chip-label">KPI Categories</span>
+
+    <!-- table area -->
+    <div class="kpi-table-wrap" id="kpiTableWrap">
+
+      <!-- default empty state -->
+      <div class="kpi-empty" id="kpiEmpty">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-text">Select a Refresh Rate to Display KPIs</div>
+        <div class="empty-sub">Choose Daily · Weekly · Monthly · Quarterly · Real Time above</div>
+      </div>
+
+      <!-- table (hidden until filter chosen) -->
+      <table class="kpi-main-table" id="kpiTable" style="display:none;">
+        <thead>
+          <tr>
+            <th class="th-kpi">KPI</th>
+            <th class="th-ehs">S</th>
+            <th class="th-quality">Q</th>
+            <th class="th-delivery">D</th>
+            <th class="th-cost">C</th>
+            <th class="th-refresh">Refresh</th>
+            <th class="th-target">Target</th>
+            <th class="th-status">Status</th>
+          </tr>
+        </thead>
+        <tbody id="kpiTableBody"></tbody>
+      </table>
+
     </div>
   </div>
 
-  <!-- ══════════ DEPARTMENT GRID ══════════ -->
-  <div class="section-label">Select a Department</div>
+  <!-- ══════════════════════════════════════
+       DEPARTMENT CARDS
+  ══════════════════════════════════════ -->
+  <div class="section-title">Select a Department</div>
 
   <div class="dept-grid">
 
-  <!-- ROW 1 -->
-
-  <!-- Production -->
-  <a class="dept-card" href="production.html"
-     style="--card-accent:#00D4AA; --icon-bg:rgba(0,212,170,0.12);">
-    <div class="card-header">
-      <div class="card-icon">🏭</div>
-      <div class="card-arrow">→</div>
-    </div>
-    <div class="card-title">Production</div>
-    <div class="card-subtitle">SWBD · LVSG · PP — Output, Yield, Delivery, Utilization</div>
-    <div class="badge-row">
-      <span class="badge badge-Q">Quality</span>
-      <span class="badge badge-D">Delivery</span>
-      <span class="badge badge-C">Cost</span>
-    </div>
-    <div class="kpi-counts">
-      <div class="kpi-count-item">
-        <div class="kpi-count-num primary">11</div>
-        <div class="kpi-count-label">Primary</div>
-      </div>
-      <div class="kpi-count-item">
-        <div class="kpi-count-num secondary">23</div>
-        <div class="kpi-count-label">Secondary</div>
-      </div>
-      <div class="kpi-count-item">
-        <div class="kpi-count-num">34</div>
-        <div class="kpi-count-label">Total KPIs</div>
-      </div>
-    </div>
-    <div class="status-mini">
-      <div class="status-mini-seg" style="background:#00C48C; flex:5;"></div>
-      <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
-      <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
-    </div>
-  </a>
-
-  <!-- Logistics -->
-  <a class="dept-card" href="logistics.html"
-     style="--card-accent:#74B9FF; --icon-bg:rgba(116,185,255,0.12);">
-    <div class="card-header">
-      <div class="card-icon">📦</div>
-      <div class="card-arrow">→</div>
-    </div>
-    <div class="card-title">Logistics</div>
-    <div class="card-subtitle">Materials · Supermarket · Warehouse · Shipping</div>
-    <div class="badge-row">
-      <span class="badge badge-D">Delivery</span>
-      <span class="badge badge-C">Cost</span>
-      <span class="badge badge-Q">Quality</span>
-    </div>
-    <div class="kpi-counts">
-      <div class="kpi-count-item">
-        <div class="kpi-count-num primary">11</div>
-        <div class="kpi-count-label">Primary</div>
-      </div>
-      <div class="kpi-count-item">
-        <div class="kpi-count-num secondary">47</div>
-        <div class="kpi-count-label">Secondary</div>
-      </div>
-      <div class="kpi-count-item">
-        <div class="kpi-count-num">58</div>
-        <div class="kpi-count-label">Total KPIs</div>
-      </div>
-    </div>
-    <div class="status-mini">
-      <div class="status-mini-seg" style="background:#00C48C; flex:4;"></div>
-      <div class="status-mini-seg" style="background:#FFB800; flex:3;"></div>
-      <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
-    </div>
-  </a>
-
-  <!-- Safety -->
-  <a class="dept-card" href="safety.html"
-     style="--card-accent:#FF7675; --icon-bg:rgba(255,118,117,0.12);">
-    <div class="card-header">
-      <div class="card-icon">🦺</div>
-      <div class="card-arrow">→</div>
-    </div>
-    <div class="card-title">Safety — EHS</div>
-    <div class="card-subtitle">Recordables, LTIR, 6S, Near Misses</div>
-    <div class="badge-row">
-      <span class="badge badge-S">Safety</span>
-    </div>
-    <div class="kpi-counts">
-      <div class="kpi-count-item">
-        <div class="kpi-count-num primary">7</div>
-        <div class="kpi-count-label">Primary</div>
-      </div>
-      <div class="kpi-count-item">
-        <div class="kpi-count-num secondary">5</div>
-        <div class="kpi-count-label">Secondary</div>
-      </div>
-      <div class="kpi-count-item">
-        <div class="kpi-count-num">12</div>
-        <div class="kpi-count-label">Total KPIs</div>
-      </div>
-    </div>
-    <div class="status-mini">
-      <div class="status-mini-seg" style="background:#00C48C; flex:3;"></div>
-      <div class="status-mini-seg" style="background:#FFB800; flex:1;"></div>
-      <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
-    </div>
-  </a>
-
-  <!-- ROW 2 -->
-
-  <!-- Engineering -->
-    <a class="dept-card" href="engineering.html"
-       style="--card-accent:#45B7D1; --icon-bg:rgba(69,183,209,0.12);">
+    <!-- Production -->
+    <a class="dept-card" href="production.html"
+       style="--card-accent:#00D4AA; --icon-bg:rgba(0,212,170,0.12);">
       <div class="card-header">
-        <div class="card-icon">⚙️</div>
+        <div class="card-icon">🏭</div>
         <div class="card-arrow">→</div>
       </div>
-      <div class="card-title">Engineering</div>
-      <div class="card-subtitle">Design, OEPR, Delivery Reliability</div>
-      <div class="badge-row">
-        <span class="badge badge-D">Delivery</span>
-      </div>
-      <div class="kpi-counts">
-        <div class="kpi-count-item">
-          <div class="kpi-count-num primary">4</div>
-          <div class="kpi-count-label">Primary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">4</div>
-          <div class="kpi-count-label">Secondary</div>
-        </div>
-        <div class="kpi-count-item">
-          <div class="kpi-count-num">8</div>
-          <div class="kpi-count-label">Total KPIs</div>
-        </div>
-      </div>
-      <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:1;"></div>
-        <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
-      </div>
-    </a>
-
-  <!-- Fabrication -->
-    <a class="dept-card" href="fabrication.html"
-       style="--card-accent:#FF6B6B; --icon-bg:rgba(255,107,107,0.12);">
-      <div class="card-header">
-        <div class="card-icon">🔧</div>
-        <div class="card-arrow">→</div>
-      </div>
-      <div class="card-title">Fabrication</div>
-      <div class="card-subtitle">OEE, Productivity, Cycle Time, Quality</div>
+      <div class="card-title">Production</div>
+      <div class="card-subtitle">SWBD · LVSG · PP — Output, Yield, Delivery, Utilization</div>
       <div class="badge-row">
         <span class="badge badge-Q">Quality</span>
         <span class="badge badge-D">Delivery</span>
@@ -589,65 +395,408 @@
       </div>
       <div class="kpi-counts">
         <div class="kpi-count-item">
-          <div class="kpi-count-num primary">8</div>
+          <div class="kpi-count-num primary">11</div>
           <div class="kpi-count-label">Primary</div>
         </div>
         <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">18</div>
+          <div class="kpi-count-num secondary">23</div>
           <div class="kpi-count-label">Secondary</div>
         </div>
         <div class="kpi-count-item">
-          <div class="kpi-count-num">26</div>
+          <div class="kpi-count-num">34</div>
           <div class="kpi-count-label">Total KPIs</div>
         </div>
       </div>
       <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:2;"></div>
-        <div class="status-mini-seg" style="background:#FF4757; flex:1;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
+        <div class="status-mini-seg" style="background:#00C48C; flex:5;"></div>
+        <div class="status-mini-seg" style="background:#FFB800; flex:2;"></div>
+        <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
       </div>
     </a>
 
-    <!-- Purchasing -->
-    <a class="dept-card" href="purchasing.html"
-       style="--card-accent:#FDCB6E; --icon-bg:rgba(253,203,110,0.12);">
+    <!-- Logistics -->
+    <a class="dept-card" href="logistics.html"
+       style="--card-accent:#74B9FF; --icon-bg:rgba(116,185,255,0.12);">
       <div class="card-header">
-        <div class="card-icon">🛍️</div>
+        <div class="card-icon">📦</div>
         <div class="card-arrow">→</div>
       </div>
-      <div class="card-title">Purchasing</div>
-      <div class="card-subtitle">Aging POs, Vendor Tracking, Requisitions</div>
+      <div class="card-title">Logistics</div>
+      <div class="card-subtitle">Materials · Supermarket · Warehouse · Shipping</div>
       <div class="badge-row">
         <span class="badge badge-D">Delivery</span>
+        <span class="badge badge-C">Cost</span>
+        <span class="badge badge-Q">Quality</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">11</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">47</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">58</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:4;"></div>
+        <div class="status-mini-seg" style="background:#FFB800; flex:3;"></div>
+        <div class="status-mini-seg" style="background:#FF4444; flex:3;"></div>
+      </div>
+    </a>
+
+    <!-- Safety -->
+    <a class="dept-card" href="safety.html"
+       style="--card-accent:#FF7675; --icon-bg:rgba(255,118,117,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🦺</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Safety — EHS</div>
+      <div class="card-subtitle">Recordables, LTIR, 6S, Near Misses</div>
+      <div class="badge-row">
+        <span class="badge badge-S">Safety</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">7</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">5</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">12</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#00C48C; flex:3;"></div>
+        <div class="status-mini-seg" style="background:#FFB800; flex:1;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+      </div>
+    </a>
+
+    <!-- Engineering (placeholder) -->
+    <a class="dept-card" href="#"
+       style="--card-accent:#A29BFE; --icon-bg:rgba(162,155,254,0.12);">
+      <div class="card-header">
+        <div class="card-icon">⚙️</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Engineering</div>
+      <div class="card-subtitle">Coming Soon</div>
+      <div class="badge-row">
+        <span class="badge badge-Q">Quality</span>
+        <span class="badge badge-D">Delivery</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">—</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">—</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">—</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+      </div>
+    </a>
+
+    <!-- Quality (placeholder) -->
+    <a class="dept-card" href="#"
+       style="--card-accent:#FDCB6E; --icon-bg:rgba(253,203,110,0.12);">
+      <div class="card-header">
+        <div class="card-icon">🔬</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Quality</div>
+      <div class="card-subtitle">Coming Soon</div>
+      <div class="badge-row">
+        <span class="badge badge-Q">Quality</span>
+      </div>
+      <div class="kpi-counts">
+        <div class="kpi-count-item">
+          <div class="kpi-count-num primary">—</div>
+          <div class="kpi-count-label">Primary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num secondary">—</div>
+          <div class="kpi-count-label">Secondary</div>
+        </div>
+        <div class="kpi-count-item">
+          <div class="kpi-count-num">—</div>
+          <div class="kpi-count-label">Total KPIs</div>
+        </div>
+      </div>
+      <div class="status-mini">
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
+      </div>
+    </a>
+
+    <!-- Finance (placeholder) -->
+    <a class="dept-card" href="#"
+       style="--card-accent:#55EFC4; --icon-bg:rgba(85,239,196,0.12);">
+      <div class="card-header">
+        <div class="card-icon">💰</div>
+        <div class="card-arrow">→</div>
+      </div>
+      <div class="card-title">Finance</div>
+      <div class="card-subtitle">Coming Soon</div>
+      <div class="badge-row">
         <span class="badge badge-C">Cost</span>
       </div>
       <div class="kpi-counts">
         <div class="kpi-count-item">
-          <div class="kpi-count-num primary">4</div>
+          <div class="kpi-count-num primary">—</div>
           <div class="kpi-count-label">Primary</div>
         </div>
         <div class="kpi-count-item">
-          <div class="kpi-count-num secondary">7</div>
+          <div class="kpi-count-num secondary">—</div>
           <div class="kpi-count-label">Secondary</div>
         </div>
         <div class="kpi-count-item">
-          <div class="kpi-count-num">11</div>
+          <div class="kpi-count-num">—</div>
           <div class="kpi-count-label">Total KPIs</div>
         </div>
       </div>
       <div class="status-mini">
-        <div class="status-mini-seg" style="background:#00C48C; flex:2;"></div>
-        <div class="status-mini-seg" style="background:#5A7A8A; flex:3;"></div>
+        <div class="status-mini-seg" style="background:#5A7A8A; flex:1;"></div>
       </div>
     </a>
 
+  </div>
 </div>
 
-  <!-- ══════════ FOOTER ══════════ -->
-  <footer>
-    <p>Siemens Manufacturing Operations · Plant KPI Dashboard · Data refreshes per department schedule</p>
-    <p style="margin-top:0.4rem; opacity:0.5;">S = Safety &nbsp;|&nbsp; Q = Quality &nbsp;|&nbsp; D = Delivery &nbsp;|&nbsp; C = Cost</p>
-  </footer>
+<div class="page-footer">Siemens Internal Dashboard · Mock Data · Grand Prairie Facility</div>
 
+<script>
+// ══════════════════════════════════════════════════════
+//  KPI DATA
+//  Each entry: { kpi, cat ('S'|'Q'|'D'|'C'), refresh, target, value }
+//  cat drives which column the pill appears in.
+// ══════════════════════════════════════════════════════
+
+const KPI_DATA = {
+
+  EHS: [
+    // ── placeholder rows – fill in when EHS data is provided ──
+    { kpi: 'Recordable Incident Rate',    cat: 'S', refresh: 'Monthly',   target: '0',       value: '0'    },
+    { kpi: 'LTIR',                        cat: 'S', refresh: 'Monthly',   target: '0',       value: '0'    },
+    { kpi: 'Near Miss Reports',           cat: 'S', refresh: 'Weekly',    target: '> 5',     value: '7'    },
+    { kpi: '6S Score',                    cat: 'S', refresh: 'Weekly',    target: '≥ 90%',   value: '87%'  },
+    { kpi: 'Days Without Incident',       cat: 'S', refresh: 'Daily',     target: 'Max',     value: '42'   },
+  ],
+
+  Quality: [
+    { kpi: 'First Pass Yield',            cat: 'Q', refresh: 'Daily',     target: '≥ 98%',   value: '96.8%' },
+    { kpi: 'Deviations Count',            cat: 'Q', refresh: 'Weekly',    target: '< 5',     value: '7'     },
+    { kpi: 'Rework Rate',                 cat: 'Q', refresh: 'Weekly',    target: '< 2%',    value: '4.2%'  },
+  ],
+
+  Logistics: [
+    // Materials
+    { kpi: 'Inventory QTR Count Accuracy',      cat: 'C', refresh: 'Quarterly', target: '≥ 95%',            value: '96.2%'  },
+    { kpi: 'Inventory Dollar Value Accuracy',   cat: 'C', refresh: 'Quarterly', target: '≥ 98%',            value: '98.5%'  },
+    { kpi: 'Inventory Adjustments',             cat: 'C', refresh: 'Monthly',   target: '< 2% Inv. Value',  value: '1.8%'   },
+    // Supermarket
+    { kpi: 'Water Level Adherence (SM)',         cat: 'D', refresh: 'Daily',     target: '≥ 95%',            value: '91.4%'  },
+    { kpi: 'Kit Aging Time (SM)',                cat: 'D', refresh: 'Daily',     target: '< 2 days',         value: '1.9 days'},
+    { kpi: 'Kit Accuracy (SM)',                  cat: 'D', refresh: 'Daily',     target: '100%',             value: '98.7%'  },
+    // Warehouse
+    { kpi: 'RTS Quantity (Overissue)',           cat: 'D', refresh: 'Daily',     target: '0',                value: '7'      },
+    { kpi: 'Water Level Adherence (WH)',         cat: 'D', refresh: 'Daily',     target: '≥ 95%',            value: '96.1%'  },
+    { kpi: 'Kit Aging Time (WH)',                cat: 'D', refresh: 'Daily',     target: '< 2 days',         value: '1.6 days'},
+    { kpi: 'Kit Accuracy (WH)',                  cat: 'D', refresh: 'Daily',     target: '100%',             value: '99.1%'  },
+    // Shipping
+    { kpi: 'Storage Locations 1000 — Aging',    cat: 'D', refresh: 'Daily',     target: '< 2 days',         value: '1.8 days'},
+    { kpi: 'Shipped Quantity',                   cat: 'D', refresh: 'Daily',     target: 'By Line',          value: 'On Track'},
+  ],
+
+  Fabrication: [
+    { kpi: 'Fabrication Output',          cat: 'D', refresh: 'Daily',     target: 'TBD',     value: '—'    },
+    { kpi: 'Fabrication Quality Rate',    cat: 'Q', refresh: 'Daily',     target: 'TBD',     value: '—'    },
+  ],
+
+  LVSG: [
+    { kpi: 'First Pass Yield',            cat: 'Q', refresh: 'Daily',     target: '≥ 98%',   value: '98.3%' },
+    { kpi: 'Delivery Reliability',        cat: 'D', refresh: 'Daily',     target: '≥ 95%',   value: '96.5%' },
+    { kpi: 'Sequence Adherence',          cat: 'D', refresh: 'Daily',     target: '≥ 95%',   value: '96.2%' },
+    { kpi: 'Aging Into Sequence',         cat: 'D', refresh: 'Daily',     target: '< 2 days',value: '1.5 days'},
+    { kpi: 'Aging WIP',                   cat: 'D', refresh: 'Daily',     target: '< 6 hrs', value: '4.8 hrs'},
+    { kpi: 'Gear Output',                 cat: 'D', refresh: 'Daily',     target: 'Per Area', value: 'On Track'},
+    { kpi: 'Scans Accuracy (>2 hrs)',     cat: 'C', refresh: 'Daily',     target: '0',        value: '1'    },
+    { kpi: 'Scans Accuracy (0 scans)',    cat: 'C', refresh: 'Weekly',    target: '0',        value: '4'    },
+    { kpi: 'Employee Utilization',        cat: 'C', refresh: 'Weekly',    target: '≥ 85%',    value: '82.1%'},
+    { kpi: 'Productivity YOY',            cat: 'C', refresh: 'Monthly',   target: '> 5%',     value: '6.3%' },
+    { kpi: 'OEPR Impact',                 cat: 'D', refresh: 'Daily',     target: 'TBD',      value: '—'    },
+  ],
+
+  PBSB: [
+    // PP + SWBD combined
+    { kpi: 'First Pass Yield',            cat: 'Q', refresh: 'Daily',     target: '≥ 98%',   value: '97.1%' },
+    { kpi: 'Delivery Reliability',        cat: 'D', refresh: 'Daily',     target: '≥ 95%',   value: '96.8%' },
+    { kpi: 'Sequence Adherence',          cat: 'D', refresh: 'Daily',     target: '≥ 95%',   value: '93.4%' },
+    { kpi: 'Aging Into Sequence',         cat: 'D', refresh: 'Daily',     target: '< 2 days',value: '2.1 days'},
+    { kpi: 'Aging WIP',                   cat: 'D', refresh: 'Daily',     target: '< 6 hrs', value: '5.9 hrs'},
+    { kpi: 'Gear Output',                 cat: 'D', refresh: 'Daily',     target: 'Per Area', value: 'On Track'},
+    { kpi: 'Scans Accuracy (>2 hrs)',     cat: 'C', refresh: 'Daily',     target: '0',        value: '3'    },
+    { kpi: 'Scans Accuracy (0 scans)',    cat: 'C', refresh: 'Weekly',    target: '0',        value: '7'    },
+    { kpi: 'Employee Utilization',        cat: 'C', refresh: 'Weekly',    target: '≥ 85%',    value: '88.3%'},
+    { kpi: 'Productivity YOY',            cat: 'C', refresh: 'Monthly',   target: '> 5%',     value: '5.5%' },
+    { kpi: 'OEPR Impact',                 cat: 'D', refresh: 'Daily',     target: 'TBD',      value: '—'    },
+  ],
+
+  Purchasing: [
+    { kpi: 'On-Time PO Delivery',         cat: 'D', refresh: 'Weekly',    target: '≥ 95%',   value: '—'    },
+    { kpi: 'Supplier Lead Time Variance', cat: 'D', refresh: 'Monthly',   target: 'TBD',     value: '—'    },
+  ],
+
+  Engineering: [
+    { kpi: 'ECO Cycle Time',              cat: 'D', refresh: 'Monthly',   target: 'TBD',     value: '—'    },
+    { kpi: 'Drawing Accuracy Rate',       cat: 'Q', refresh: 'Monthly',   target: 'TBD',     value: '—'    },
+  ],
+};
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let activeDept   = 'EHS';
+let activeFilter = null;   // null = nothing shown
+
+// ══════════════════════════════════════════════════════
+//  TAB / FILTER HANDLERS
+// ══════════════════════════════════════════════════════
+function selectDept(dept, btn) {
+  activeDept = dept;
+  document.querySelectorAll('.dept-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTable();
+}
+
+function selectFilter(freq, btn) {
+  // toggle off if already active
+  if (activeFilter === freq) {
+    activeFilter = null;
+    btn.classList.remove('active');
+  } else {
+    activeFilter = freq;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  renderTable();
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════════
+function renderTable() {
+  const empty = document.getElementById('kpiEmpty');
+  const table = document.getElementById('kpiTable');
+  const tbody = document.getElementById('kpiTableBody');
+
+  // No filter selected → show empty state
+  if (!activeFilter) {
+    empty.style.display = 'flex';
+    table.style.display = 'none';
+    return;
+  }
+
+  const rows = (KPI_DATA[activeDept] || [])
+    .filter(r => r.refresh === activeFilter);
+
+  if (rows.length === 0) {
+    empty.style.display = 'flex';
+    empty.querySelector('.empty-text').textContent = 'No ' + activeFilter + ' KPIs for ' + activeDept;
+    empty.querySelector('.empty-sub').textContent  = 'Try a different refresh rate or department.';
+    table.style.display = 'none';
+    return;
+  }
+
+  empty.style.display = 'none';
+  table.style.display = 'table';
+
+  // Sort order: S → Q → D → C
+  const catOrder = { S: 0, Q: 1, D: 2, C: 3 };
+  const sorted = [...rows].sort((a, b) => catOrder[a.cat] - catOrder[b.cat]);
+
+  tbody.innerHTML = sorted.map(r => {
+    const pillS = r.cat === 'S' ? `<span class="cat-pill pill-S">S</span>` : '';
+    const pillQ = r.cat === 'Q' ? `<span class="cat-pill pill-Q">Q</span>` : '';
+    const pillD = r.cat === 'D' ? `<span class="cat-pill pill-D">D</span>` : '';
+    const pillC = r.cat === 'C' ? `<span class="cat-pill pill-C">C</span>` : '';
+
+    const { dot, label } = getStatus(r);
+
+    return `
+    <tr>
+      <td>${r.kpi}</td>
+      <td>${pillS}</td>
+      <td>${pillQ}</td>
+      <td>${pillD}</td>
+      <td>${pillC}</td>
+      <td><span class="refresh-badge">${r.refresh}</span></td>
+      <td style="color:#55efc4; font-size:0.75rem;">${r.target}</td>
+      <td>
+        <div class="status-dot-cell">
+          <div class="sdot ${dot}"></div>
+          <span style="font-size:0.72rem; color:#aaaacc;">${label}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  STATUS LOGIC
+// ══════════════════════════════════════════════════════
+function getStatus(r) {
+  if (r.value === '—' || r.target === 'TBD' || r.value === 'TBD') {
+    return { dot: 'sdot-grey', label: 'No Data' };
+  }
+  if (r.value === 'On Track') {
+    return { dot: 'sdot-green', label: 'On Track' };
+  }
+
+  const rawVal    = parseFloat(String(r.value).replace(/[^0-9.-]/g, ''));
+  const rawTarget = parseFloat(String(r.target).replace(/[^0-9.-]/g, ''));
+
+  if (isNaN(rawVal) || isNaN(rawTarget)) {
+    return { dot: 'sdot-grey', label: 'No Data' };
+  }
+
+  const isLower  = String(r.target).startsWith('<');
+  const isHigher = String(r.target).startsWith('≥') || String(r.target).startsWith('>');
+
+  if (isLower) {
+    if (rawVal <= rawTarget)            return { dot: 'sdot-green',  label: 'On Track' };
+    if (rawVal <= rawTarget * 1.15)     return { dot: 'sdot-yellow', label: 'Monitor'  };
+    return                                     { dot: 'sdot-red',    label: 'At Risk'  };
+  }
+  if (isHigher) {
+    if (rawVal >= rawTarget)            return { dot: 'sdot-green',  label: 'On Track' };
+    if (rawVal >= rawTarget * 0.97)     return { dot: 'sdot-yellow', label: 'Monitor'  };
+    return                                     { dot: 'sdot-red',    label: 'At Risk'  };
+  }
+  // exact (e.g. target = 0)
+  return rawVal === rawTarget
+    ? { dot: 'sdot-green', label: 'On Track' }
+    : { dot: 'sdot-red',   label: 'At Risk'  };
+}
+
+// init — EHS tab active, no filter
+selectDept('EHS', document.querySelector('.dept-tab.active'));
+</script>
 </body>
 </html>
